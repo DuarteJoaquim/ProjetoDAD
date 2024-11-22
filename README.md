@@ -1,2 +1,6 @@
-# DAD-2023-24-Project-Tutorials
-Tutorials related to the project for the DAD 2023/24 course
+# DAD-2024-25-Project
+
+Duarte - 2212500@my.ipleiria.pt
+Diogo - 2211433@my.ipleiria.pt
+Marcelo - 2210742@my.ipleiria.pt
+Francisco - 2212119@my.ipleiria.pt
