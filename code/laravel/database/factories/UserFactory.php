@@ -25,9 +25,13 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'nickname' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'brain_coins_balance' => fake()->numberBetween(0, 50), // Saldo inicial aleatório
+            'type' => 'P', // Tipo padrão: Jogador
+            'blocked' => false, // Por padrão, o usuário não está bloqueado
             'remember_token' => Str::random(10),
         ];
     }
@@ -39,6 +43,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function administrator(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'type' => 'A', // Tipo: Administrador
+        ]);
+    }
+
+    /**
+     * Indicate that the user is blocked.
+     */
+    public function blocked(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'blocked' => true,
         ]);
     }
 }

@@ -66,6 +66,29 @@ class UsersSeeder extends Seeder
             $this->command->info("Saved $totalGuardados/$totalParaGuardar users on the database");
             DB::table('users')->insert($variosUsers);
         }
+
+        // Gerar transações para cada jogador
+        $this->command->info("Generating transactions for players...");
+        $faker = \Faker\Factory::create();
+        $users = DB::table('users')->where('type', 'P')->pluck('id');
+
+        foreach ($users as $userId) {
+            $numTransactions = $faker->numberBetween(1, 10); // Cada jogador terá entre 1 e 10 transações
+            for ($i = 0; $i < $numTransactions; $i++) {
+                DB::table('transactions')->insert([
+                    'type' => $faker->randomElement(['B', 'P', 'I']), // Tipos: Bônus, Compra ou Interno
+                    'user_id' => $userId,
+                    'transaction_datetime' => $faker->dateTimeBetween('-1 year', 'now'),
+                    'euros' => $faker->randomFloat(2, 1, 50), // Valor da transação em euros (apenas para compras)
+                    'brain_coins' => $faker->numberBetween(1, 50), // Quantidade de brain coins envolvidos
+                    'game_id' => null, // Relacione com um jogo se necessário
+                    'payment_type' => $faker->randomElement(['MBWAY', 'PAYPAL', 'IBAN', 'MB', 'VISA']),
+                    'payment_reference' => $faker->uuid, // Referência fictícia de pagamento
+                ]);
+            }
+        }
+        $this->command->info("Transactions generated successfully.");
+
         $this->orderAllTimestamps($faker);
         // UsersSeeder::$allUsers['A'] = DB::table('users')->where('type', 'A')->orderBy('id')->pluck('email', 'id');
         // UsersSeeder::$allUsers['P'] = DB::table('users')->where('type', 'P')->orderBy('id')->pluck('email', 'id');
@@ -108,7 +131,7 @@ class UsersSeeder extends Seeder
         }
         if (count($idsToDelete) > 0) {
             $this->command->info("Soft Delete " . count($idsToDelete) . " users on the database");
-            DB::table('users')->whereNotIn('id', $idsToDelete)->update(['deleted_at' => null]);
+            DB::table('users')->whereIn('id', $idsToDelete)->update(['deleted_at' => now()]);
         }
 
 
@@ -197,6 +220,11 @@ class UsersSeeder extends Seeder
             } else {
                 $this->files_F[] = $f->getPathname();
             }
+        }
+
+        // Validação: Certifique-se de que há fotos suficientes
+        if (empty($this->files_M) || empty($this->files_F)) {
+            $this->command->warn("Não há fotos suficientes no diretório 'seeders/photos'.");
         }
     }
 
@@ -299,7 +327,7 @@ class UsersSeeder extends Seeder
             'updated_at' => $tmpDateTime,
             'type' => $type,
             'blocked' => 0,
-            'brain_coins_balance' => 0,
+            'brain_coins_balance' => $faker->numberBetween(0, 100), // De 0 a 100 moedas
             'deleted_at' => $tmpDateTime,
         ];
     }
@@ -311,7 +339,7 @@ class UsersSeeder extends Seeder
         $totalUsers = $allUsers->count();
         $randomDates = [];
         for ($i = 0; $i < $totalUsers; $i++) {
-            $randomDates[] = Carbon::today()->subDays(rand(1, 365))->addSeconds(rand(0, 60*60*24));
+            $randomDates[] = Carbon::today()->subDays(rand(1, 365))->addSeconds(rand(0, 60 * 60 * 24));
         }
         $randomDatesCollection = collect($randomDates);
         $orderedDates = $randomDatesCollection->sort(function ($a, $b) {
@@ -367,5 +395,3 @@ class UsersSeeder extends Seeder
     }
     */
 }
-
-
