@@ -1,139 +1,227 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
-import axios from 'axios'
-import { useErrorStore } from '@/stores/error'
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import axios from "axios";
+import { useErrorStore } from "@/stores/error";
+import { useCoinsStore } from "@/stores/coins";
+import { useRouter } from "vue-router";
+import avatarNoneAssetURL from "@/assets/avatar-none.png";
+import { useToast } from '@/components/ui/toast/use-toast'
 
-import avatarNoneAssetURL from '@/assets/avatar-none.png'
+export const useAuthStore = defineStore("auth", () => {
+  const router = useRouter();
+  const storeError = useErrorStore();
+  const storeCoins = useCoinsStore();
+  const { toast } = useToast();
 
-export const useAuthStore = defineStore('auth', () => {
-  const storeError = useErrorStore()
+  const user = ref(null);
+  const token = ref("");
 
-  const user = ref(null)
-  const token = ref('')
-
+  const errorsRegister = ref([]);
+  const errorsUpdateProfile = ref([]);
+  const success = ref(false);
+  
   const userName = computed(() => {
-    return user.value ? user.value.name : ''
-  })
-
-  const userFirstLastName = computed(() => {
-    const names = userName.value.trim().split(' ')
-    const firstName = names[0] ?? ''
-    const lastName = names.length > 1 ? names[names.length - 1] : ''
-    return (firstName + ' ' + lastName).trim()
-  })
-
+    return user.value ? user.value.name : "";
+  });
+  
   const userEmail = computed(() => {
-    return user.value ? user.value.email : ''
-  })
+    return user.value ? user.value.email : "";
+  });
 
+  const userNickname = computed(() => {
+    return user.value ? user.value.nickname : "";
+  });
+  
   const userType = computed(() => {
-    return user.value ? user.value.type : ''
-  })
-
-  const userGender = computed(() => {
-    return user.value ? user.value.gender : ''
-  })
+    return user.value ? user.value.type : "";
+  });
 
   const userPhotoUrl = computed(() => {
-    const photoFile = user.value ? (user.value.photoFileName ?? '') : ''
+    const photoFile = user.value ? user.value.photoFileName ?? "" : "";
     if (photoFile) {
-      return axios.defaults.baseURL.replaceAll('/api', photoFile)
+      return axios.defaults.baseURL.replaceAll("/api", photoFile);
     }
-    return avatarNoneAssetURL
-  })
+    return avatarNoneAssetURL;
+  });
 
   // This function is "private" - not exported by the store
   const clearUser = () => {
-    resetIntervalToRefreshToken()
-    user.value = null
-    axios.defaults.headers.common.Authorization = ''
-  }
+    resetIntervalToRefreshToken();
+    user.value = null;
+    axios.defaults.headers.common.Authorization = "";
+    localStorage.removeItem("token");
+  };
 
   const login = async (credentials) => {
-    storeError.resetMessages()
+    storeError.resetMessages();
     try {
-      const responseLogin = await axios.post('auth/login', credentials)
-      token.value = responseLogin.data.token
-      axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
-      const responseUser = await axios.get('users/me')
-      user.value = responseUser.data
-      repeatRefreshToken()
-      return user.value
+      const responseLogin = await axios.post("auth/login", credentials);
+      token.value = responseLogin.data.token;
+      axios.defaults.headers.common.Authorization = "Bearer " + token.value;
+      localStorage.setItem("token", token.value);
+      const responseUser = await axios.get("users/me");
+      user.value = responseUser.data.data;
+      repeatRefreshToken();
+      storeCoins.getCoins();
+      router.push({ name: "dashboard" });
+
+      setTimeout(() => {
+        toast({
+          description: 'Login successful!',
+          className: 'toast-success',
+        });
+      }, 1000);
+
+      return user.value;
     } catch (e) {
-      clearUser()
+      clearUser();
       storeError.setErrorMessages(
         e.response.data.message,
         e.response.data.errors,
         e.response.status,
-        'Authentication Error!'
-      )
-      return false
+        "Authentication Error!"
+      );
+      return false;
     }
-  }
+  };
+
+  const register = async (credentials) => {
+    storeError.resetMessages(); // Reseta mensagens de erro antes de iniciar
+    try {
+      await axios.post("auth/register", credentials);
+  
+      return loginResponse = await login({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+    } catch (e) {
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        "Registration Error!"
+      );
+      if (e.response?.data.errors != null) {
+        errorsRegister.value = e.response.data.errors;
+      }
+      return false;
+    }
+  };
+
+  const updateProfile = async (credentials) => {
+    storeError.resetMessages(); // Reseta mensagens de erro antes de iniciar
+    try {
+      errorsUpdateProfile.value = [];
+      success.value = false;
+      const responseUser = await axios.put("auth/updateProfile", credentials);
+      user.value = null;
+      user.value = responseUser.data.data;
+      success.value = true;
+    } catch (e) {
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        "Registration Error!"
+      );
+      if (e.response?.data.errors != null) {
+        errorsUpdateProfile.value = e.response.data.errors;
+      }
+      return false;
+    }
+  };
 
   const logout = async () => {
-    storeError.resetMessages()
+    storeError.resetMessages();
     try {
-      await axios.post('auth/logout')
-      clearUser()
-      return true
+      router.push({ name: 'dashboard' })
+      await axios.post("auth/logout");
+      clearUser();
+      return true;
     } catch (e) {
-      clearUser()
+      clearUser();
       storeError.setErrorMessages(
         e.response.data.message,
         [],
         e.response.status,
-        'Authentication Error!'
-      )
-      return false
+        "Authentication Error!"
+      );
+      return false;
     }
-  }
+  };
 
-  let intervalToRefreshToken = null
-
+  // These 2 functions and intervalToRefreshToken variable are "private" - not exported
+  let intervalToRefreshToken = null;
   const resetIntervalToRefreshToken = () => {
     if (intervalToRefreshToken) {
-      clearInterval(intervalToRefreshToken)
+      clearInterval(intervalToRefreshToken);
     }
-    intervalToRefreshToken = null
-  }
+    intervalToRefreshToken = null;
+  };
 
   const repeatRefreshToken = () => {
     if (intervalToRefreshToken) {
-      clearInterval(intervalToRefreshToken)
+      clearInterval(intervalToRefreshToken);
     }
-    intervalToRefreshToken = setInterval(
-      async () => {
-        try {
-          const response = await axios.post('auth/refreshtoken')
-          token.value = response.data.token
-          axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
-          return true
-        } catch (e) {
-          clearUser()
-          storeError.setErrorMessages(
-            e.response.data.message,
-            e.response.data.errors,
-            e.response.status,
-            'Authentication Error!'
-          )
-          return false
-        }
-      },
-      1000 * 60 * 110
-    )
-    return intervalToRefreshToken
-  }
+    intervalToRefreshToken = setInterval(async () => {
+      try {
+        const response = await axios.post("auth/refreshtoken");
+        token.value = response.data.token;
+        axios.defaults.headers.common.Authorization = "Bearer " + token.value;
+        localStorage.setItem("token", token.value);
+        return true;
+      } catch (e) {
+        clearUser();
+        storeError.setErrorMessages(
+          e.response.data.message,
+          e.response.data.errors,
+          e.response.status,
+          "Authentication Error!"
+        );
+        return false;
+      }
+    }, 1000 * 60 * 110); // repeat every 110 minutes
+    // To test the refresh token, replace previous line with the following code
+    // This will repeat the refreshtoken endpoint every 10 seconds:
+    //}, 1000 * 10)
+    return intervalToRefreshToken;
+  };
+
+
+  const restoreToken = async function () {
+    let storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      try {
+        token.value = storedToken;
+        axios.defaults.headers.common.Authorization = "Bearer " + token.value;
+        const responseUser = await axios.get("users/me");
+        storeCoins.getCoins();
+        user.value = responseUser.data.data;
+        repeatRefreshToken();
+        return true;
+      } catch {
+        clearUser();
+        return false;
+      }
+    }
+    return false;
+  };
 
   return {
     user,
     userName,
-    userFirstLastName,
     userEmail,
+    userNickname,
     userType,
-    userGender,
     userPhotoUrl,
+    errorsRegister,
+    errorsUpdateProfile,
+    success,
+    register,
     login,
-    logout
-  }
-})
+    logout,
+    restoreToken,
+    updateProfile,
+  };
+});
