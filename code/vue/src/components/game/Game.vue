@@ -247,6 +247,7 @@ const goToHome = () => {
 };
 </script>
 
+
 <template>
   <div class="text">
     <h3>Pares encontrados: <span>{{ resultMessage }}</span></h3>
@@ -254,125 +255,145 @@ const goToHome = () => {
     <h3>Tempo decorrido: <span>{{ timer }}</span>s</h3>
 
     <div class="board" :style="`grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, auto);`">
-  <div
-    v-for="(card, index) in cards"
-    :key="index"
-    class="card"
-    :class="card.isFlipped ? 'flipped' : 'card'" 
-    @click="flipCard(index)"
-  >
-    <img :src="card.isFlipped || card.isMatched ? card.img : hidden" />
-  </div>
-</div>
+      <div
+        v-for="(card, index) in cards"
+        :key="index"
+        class="card"
+        :class="card.isFlipped ? 'flipped' : 'card'" 
+        @click="flipCard(index)"
+      >
+        <img :src="card.isFlipped || card.isMatched ? card.img : hidden" />
+      </div>
+    </div>
 
-<div v-if="authStore.user" class="hint-container">
-  <button 
-    class="hint-button" 
-    @click="gameStore.useHint(cards)" 
-    :disabled="gameStore.hintsUsed >= gameStore.maxHints || storeCoins.getCoins < 1">
-    Comprar Dica ({{ gameStore.maxHints - gameStore.hintsUsed }} restantes)
-  </button>
-</div>
-
-
+    <div v-if="authStore.user" class="hint-container">
+      <button 
+        class="hint-button" 
+        @click="gameStore.useHint(cards)" 
+        :disabled="gameStore.hintsUsed >= gameStore.maxHints || storeCoins.getCoins < 1">
+        Comprar Dica ({{ gameStore.maxHints - gameStore.hintsUsed }} restantes)
+      </button>
+    </div>
 
     <div v-if="gameFinished" class="button-container">
-      <button class="dashboard-button" @click="playAgain">Play Again</button>
-      <button class="dashboard-button" @click="goToHome">Back to Home</button>
+      <button class="dashboard-button" @click="playAgain">Jogar Novamente</button>
+      <button class="dashboard-button" @click="goToHome">Voltar ao Início</button>
     </div>
   </div>
 </template>
 
-
 <style scoped>
 
-  .text {
-    text-align: center;
-    margin-top: 20px;
-  }
 
-
-  .board {
-    padding-top: 20px;
-    margin: 20px auto;
-    display: grid;
-    gap: 5px;
-    width: 50%;
-    max-width: 400px;
-    justify-content: center;
-    align-content: center;
-  }
-
-  .card img {
-    width: 80%;
-    height: auto;
-    transition: transform 0.3s;
-  }
-
-  .card img:hover {
-    transform: scale(1.05);
-  }
-
-  h1 {
-    text-align: center;
-    margin-bottom: 10px;
-    color: #31485A;
-  }
-
-  h3 {
-    text-align: center;
-    margin: 10px 0;
-    color: #31485A;
-  }
-
-  .button-container {
-    padding-top: 50px;
+.text {
+  background-color: #121212 !important;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    gap: 20px;
-    margin-top: 30px;
-  }
+    min-height: 100vh;
+    padding: 10px;
+    color: var(--foreground);
+    text-align: center;
+}
 
-  .dashboard-button {
-    background-color: #31485A;
-    color: #ffffff;
-    font-size: 1rem;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  }
+.board {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: grid;
+  gap: 5px;
+  width: 50%;
+  max-width: 400px;
+  justify-content: center;
+  align-content: center;
+}
 
-  .dashboard-button:hover {
-    background-color: #253544;
-    transform: translateY(-2px);
-  }
+.card img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
 
-  .hint-container {
+.card img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+h3 {
+  margin: 10px 0;
+  color: var(--primary); /* Cor do tema */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.button-container {
+  padding-top: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.dashboard-button {
+  background: linear-gradient(145deg, #3944BC, #283593);
+  color: var(--primary-foreground); /* Texto claro */
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: 2px solid #5763D6;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-button:hover {
+  background: linear-gradient(145deg, #283593, #1A237E);
+  transform: translateY(-2px);
+}
+
+.hint-container {
   margin-top: 20px;
   text-align: center;
 }
 
 .hint-button {
-  background-color: #4CAF50;
+  background: linear-gradient(145deg, #4CAF50, #45A049);
   color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .hint-button:disabled {
-  background-color: #ccc;
+  background-color: #555;
+  color: #aaa;
   cursor: not-allowed;
+  border: 2px solid #444;
 }
 
 .hint-button:hover:not(:disabled) {
-  background-color: #45a049;
+  background: linear-gradient(145deg, #45A049, #388E3C);
+}
+
+@media (max-width: 768px) {
+  .board {
+    width: 90%;
+  }
+
+  .card img {
+    width: 80%;
+  }
+
+  .dashboard-button,
+  .hint-button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
 }
 </style>

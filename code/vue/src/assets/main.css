@@ -1,11 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Metrophobic&display=swap');
+
 
 /*@import './base.css';*/
 
 body {
-  font-family: 'Metrophobic', sans-serif;
+  font-family: 'Metrophobic', sans-serif !important;
 }
 
 @layer base {
