@@ -5,6 +5,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import axios from 'axios'
 import { io } from 'socket.io-client'
+import socket from "@/lib/socket"; // Importa o WebSocket configurado
 
 import App from './App.vue'
 import router from './router'
@@ -28,7 +29,7 @@ console.log('WebSocket Connection:', wsConnection)
 axios.defaults.baseURL = `http://${apiDomain}/api`
 
 // Configuração do WebSocket como global
-const socket = io(wsConnection)
+//const socket = io(wsConnection)
 app.provide('socket', socket)
 
 // Fornecer o baseUrl para outros componentes

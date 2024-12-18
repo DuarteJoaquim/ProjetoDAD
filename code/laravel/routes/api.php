@@ -6,6 +6,7 @@ use App\Http\Controllers\api\BoardController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\TransactionController;
+use App\Http\Controllers\MultiplayerGameController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -22,6 +23,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/users/me/coins/spend', [TransactionController::class, 'spendCoins']);
     
     Route::post('/game', [GameController::class, 'store']);
+
+    Route::post('/multiplayer/create', [MultiplayerGameController::class, 'create']);
+    Route::post('/multiplayer/join', [MultiplayerGameController::class, 'join']);
+    Route::post('/multiplayer/turn', [MultiplayerGameController::class, 'submitTurn']);
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);

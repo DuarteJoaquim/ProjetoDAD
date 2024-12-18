@@ -2,8 +2,12 @@
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
   import { useAuthStore } from '@/stores/auth'
-
+  import socket from "@/lib/socket";
+  
   const storeAuth = useAuthStore();
+
+
+  const multiplayerLeaderboard = ref([]); 
 
   // Personal Scoreboard Data
   const personalScores = ref([]);
@@ -12,6 +16,24 @@
   const globalScores3by4 = ref([]);
   const globalScores4by4 = ref([]);
   const globalScores6by6 = ref([]);
+
+
+
+  const fetchMultiplayerLeaderboard = async () => {
+    try {
+      // Emitir o pedido para o leaderboard
+      socket.emit("requestLeaderboard");
+
+      // Escutar a resposta
+      socket.on("receiveLeaderboard", (data) => {
+        console.log("Leaderboard recebido:", data);
+        multiplayerLeaderboard.value = data;
+      });
+    } catch (error) {
+      console.error("Erro ao buscar leaderboard multiplayer:", error);
+    }
+  };
+
 
   // Fetch Personal Scoreboard Data
   const fetchPersonalScores = async () => {
@@ -67,6 +89,7 @@
 
   // Load data on component mount
   onMounted(() => {
+    fetchMultiplayerLeaderboard();
     fetchPersonalScores();
     fetchGlobalScores3by4();
     fetchGlobalScores4by4();
@@ -81,6 +104,32 @@
 
     <br>
     <!-- <h1>Scoreboard</h1> -->
+
+    <!-- Multiplayer Leaderboard -->
+    <div class="global-scoreboard">
+      <h2>Multiplayer Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Player</th>
+            <th>Wins</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="multiplayerLeaderboard.length === 0">
+            <td colspan="3" class="no-data">No multiplayer scores available</td>
+          </tr>
+          <tr v-else v-for="(player, index) in multiplayerLeaderboard" :key="player.nickname">
+            <td :style="getMedalStyle(index)">{{ index + 1 }}</td>
+            <td>{{ player.nickname }}</td>
+            <td>{{ player.wins }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <hr />
+
 
     <!-- Personal Scoreboard -->
     <div v-if="storeAuth.user" class="personal-scoreboard">
@@ -204,6 +253,7 @@
     color: #333;
     background-color: #fff;
   }
+
 
   h1 {
     margin-bottom: 30px;
