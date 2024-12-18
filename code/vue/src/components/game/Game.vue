@@ -32,9 +32,6 @@
   const firstCardTimestamp = ref(null);
   const lastCardTimestamp = ref(null);
   
-  const timer = ref(0);
-  const timerInterval = ref(null);
-  
   const cols = ref();
   const rows = ref();
   
@@ -92,17 +89,6 @@
     }
   };
 
-  const startTimer = () => {
-    timer.value = 0;
-    timerInterval.value = setInterval(() => {
-      timer.value++;
-    }, 1000);
-  };
-
-  const stopTimer = () => {
-    clearInterval(timerInterval.value);
-  };
-
 
   // Generate the cards based on board dimensions
   const generateCards = () => {
@@ -133,7 +119,6 @@
   // Start the game timer on the first flip
   if (!gameStarted.value) {
     gameStarted.value = true;
-    startTimer();
     firstCardTimestamp.value = Date.now();
   }
 
@@ -184,7 +169,6 @@
   const updateResultMessage = () => {
     if (cardsWon.value.length === cards.value.length / 2) {
       resultMessage.value = 'Congratulations! You found all the pairs!';
-      stopTimer(); // Stop the timer
       lastCardTimestamp.value = Date.now();
       gameData.value.total_time = Math.round((lastCardTimestamp.value - firstCardTimestamp.value) / 1000); // Em segundos
       gameData.value.first_card_timestamp = firstCardTimestamp.value;
