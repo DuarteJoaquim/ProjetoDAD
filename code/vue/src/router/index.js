@@ -9,6 +9,8 @@ import GameHistory from '@/components/game/GameHistory.vue';
 import Scoreboard from '@/components/game/Scoreboard.vue';
 import Coins from '@/components/coins/Coins.vue';
 import WebSocketTest from "@/components/WebSocketTest.vue";
+import Lobby from "@/components/game/Lobby.vue";
+import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
 
@@ -25,6 +27,21 @@ const router = createRouter({
     { path: '/game', name: 'game', component: Game },
     { path: '/coins', name: 'coins', component: Coins },
     { path: "/websocket", name: "websocket", component: WebSocketTest },
+    {
+      path: '/multi',
+      name: 'multiPlayerGames',
+      component: Lobby // Apenas para a lista de lobbys
+    },
+    {
+      path: '/multi/lobby',
+      name: 'lobby',
+      component: Lobby // Página do lobby do jogo
+    },
+    {
+      path: '/multi/game',
+      name: 'multiPlayerGame',
+      component: GameMultiplayer // Página do jogo multiplayer
+    },
     { path: "/:pathMatch(.*)*", redirect: "/" },
   ],
 });
@@ -37,7 +54,12 @@ router.beforeEach(async (to, from, next) => {
 
   if (handlingFirstRoute) {
     handlingFirstRoute = false;
-    await storeAuth.restoreToken();
+    try {
+      await storeAuth.restoreToken();
+    } catch {
+      storeAuth.logout();
+      console.error("Token inválido, utilizador desconectado.");
+    }
   }
 
   const boardId = parseInt(to.query.boardId, 10) || 1; // Valor padrão 1
@@ -57,6 +79,16 @@ router.beforeEach(async (to, from, next) => {
     next({ name: "dashboard" });
     return;
   }
+
+  if (to.name === "lobby" && !storeAuth.user) {
+    toast({
+      description: "Acesso restrito ao lobby! Faça login para continuar.",
+      className: "toast-warning",
+    });
+    next({ name: "dashboard" });
+    return;
+  }
+  
   next();
 });
 
