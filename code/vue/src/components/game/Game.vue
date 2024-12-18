@@ -28,6 +28,9 @@
   
   const gameStarted = ref(false);
   const gameFinished = ref(false);
+
+  const firstCardTimestamp = ref(null);
+  const lastCardTimestamp = ref(null);
   
   const timer = ref(0);
   const timerInterval = ref(null);
@@ -46,6 +49,8 @@
     total_time: 0,
     total_turns_winner: 0,
     board_id: boardId,
+    first_card_timestamp : 0,
+    last_card_timestamp : 0,
   });
 
 
@@ -129,6 +134,7 @@
   if (!gameStarted.value) {
     gameStarted.value = true;
     startTimer();
+    firstCardTimestamp.value = Date.now();
   }
 
   // Flip the selected card
@@ -179,6 +185,10 @@
     if (cardsWon.value.length === cards.value.length / 2) {
       resultMessage.value = 'Congratulations! You found all the pairs!';
       stopTimer(); // Stop the timer
+      lastCardTimestamp.value = Date.now();
+      gameData.value.total_time = Math.round((lastCardTimestamp.value - firstCardTimestamp.value) / 1000); // Em segundos
+      gameData.value.first_card_timestamp = firstCardTimestamp.value;
+      gameData.value.last_card_timestamp = lastCardTimestamp.value;
       gameStore.sendGameData(gameData.value, timer.value, counter.value);
       gameFinished.value = true;
     } else {
@@ -208,6 +218,9 @@
   timer.value = 0;
   gameFinished.value = false;
   gameStarted.value = false;
+
+  firstCardTimestamp.value = null;
+  lastCardTimestamp.value = null;
 
   // Reseta as dicas
   gameStore.hintsUsed = 0; // Reinicia o contador de dicas
