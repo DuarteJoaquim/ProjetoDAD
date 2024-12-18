@@ -1,11 +1,24 @@
 <script setup>
-import Toaster from './components/ui/toast/Toaster.vue';
-
+import Header from './components/Header.vue';
+import Toaster from '@/components/ui/toast/Toaster.vue';
 </script>
 
 <template>
+  <Header />
   <Toaster />
-  <div class="min-h-screen bg-gray-50">
-        <RouterView />
-  </div>
+  <main>
+    <div id="app">
+      <router-view />
+    </div>
+  </main>
 </template>
+
+<style scoped>
+#app {
+  background-color: white;
+  min-height: 100vh;
+}
+</style>
+
+
+
