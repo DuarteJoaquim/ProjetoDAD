@@ -87,19 +87,13 @@ export const useGameStore = defineStore("game", () => {
     });
   };
 
-  const sendGameData = async (gameData, timer, counter) => {
+  const sendGameData = async (gameData, counter) => {
     try {
-      console.log('Game data:', gameData);
-      console.log('Timer:', timer);
-      console.log('Counter:', counter);
-
       // Check if the user is logged in
       if (!authStore.user) {
         return;
       }
 
-      // Update game data
-      gameData.total_time = timer;
       gameData.total_turns_winner = counter;
 
       console.log('Game data:', gameData);
@@ -148,11 +142,34 @@ export const useGameStore = defineStore("game", () => {
     }
   };
 
+  const formatDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  const startTimer = (timer,timerInterval) => {
+    timer.value = 0;
+    timerInterval.value = setInterval(() => {
+      timer.value++;
+    }, 1000);
+  };
+
+  const stopTimer = (timerInterval) => {
+    clearInterval(timerInterval.value);
+  };
 
   return {
     sendGameData,
     useHint,
     hintsUsed,
     maxHints,
+    formatDateTime,
+    startTimer,
+    stopTimer,
   };
 });

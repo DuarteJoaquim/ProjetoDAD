@@ -14,7 +14,6 @@
 
   const lockBoard = ref(false);
   const lockDuration = 100; // Default lock duration in milliseconds
-  let lockTimeout = null;
 
   const boardId = parseInt(route.query.boardId);
 
@@ -25,6 +24,9 @@
 
   const resultMessage = ref('0');
   const counter = ref(0);
+
+  const timer = ref(0);
+  const timerInterval = ref(null);
   
   const gameStarted = ref(false);
   const gameFinished = ref(false);
@@ -50,6 +52,8 @@
     ended_at : 0,
   });
 
+
+  
 
 
   // Initialize cards
@@ -120,6 +124,7 @@
   if (!gameStarted.value) {
     gameStarted.value = true;
     firstCardTimestamp.value = Date.now();
+    gameStore.startTimer(timer,timerInterval);
   }
 
   // Flip the selected card
@@ -170,10 +175,11 @@
     if (cardsWon.value.length === cards.value.length / 2) {
       resultMessage.value = 'Congratulations! You found all the pairs!';
       lastCardTimestamp.value = Date.now();
-      gameData.value.total_time = Math.round((lastCardTimestamp.value - firstCardTimestamp.value) / 1000); // Em segundos
-      gameData.value.began_at_timestamp = firstCardTimestamp.value;
-      gameData.value.ended_at = lastCardTimestamp.value;
-      gameStore.sendGameData(gameData.value, timer.value, counter.value);
+      gameStore.stopTimer(timerInterval);
+      gameData.value.total_time = ((lastCardTimestamp.value - firstCardTimestamp.value) / 1000).toFixed(2);
+      gameData.value.began_at = gameStore.formatDateTime(new Date(firstCardTimestamp.value));
+      gameData.value.ended_at = gameStore.formatDateTime(new Date(lastCardTimestamp.value));
+      gameStore.sendGameData(gameData.value,counter.value);
       gameFinished.value = true;
     } else {
       resultMessage.value = cardsWon.value.length;
