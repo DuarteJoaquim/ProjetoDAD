@@ -11,8 +11,6 @@
   const storeCoins = useCoinsStore();
   const authStore = useAuthStore();
 
-  const isMockMode = ref(route.query.mock === "true");
-
 
   const lockBoard = ref(false);
   const lockDuration = 100; // Default lock duration in milliseconds
@@ -47,7 +45,7 @@
   const gameData = ref({
     total_time: 0,
     total_turns_winner: 0,
-    board_id: isMockMode.value ? 4 : boardId,
+    board_id: boardId,
   });
 
 
@@ -78,13 +76,6 @@
     { name: '20', img: new URL('@/assets/img/icon/20.png', import.meta.url).href, isFlipped: false, isMatched: false },
   ]);
 
-  const mockCards = [
-  { name: '0', img: new URL('@/assets/img/icon/0.png', import.meta.url).href, isFlipped: false, isMatched: false },
-  { name: '0', img: new URL('@/assets/img/icon/0.png', import.meta.url).href, isFlipped: false, isMatched: false },
-  { name: '1', img: new URL('@/assets/img/icon/1.png', import.meta.url).href, isFlipped: false, isMatched: false },
-  { name: '1', img: new URL('@/assets/img/icon/1.png', import.meta.url).href, isFlipped: false, isMatched: false },
-];
-
 
   const getBoard = async () => {
     try {
@@ -111,9 +102,6 @@
   // Generate the cards based on board dimensions
   const generateCards = () => {
 
-    if (isMockMode.value) {
-    cards.value = mockCards; // Use as cartas fixas para mock mode
-    } else {
     const totalCards = cols.value * rows.value;
     const requiredPairs = Math.floor(totalCards / 2);
 
@@ -125,7 +113,6 @@
     const shuffledInitialCards = [...initialCards.value].sort(() => Math.random() - 0.5);
     const cardsToUse = shuffledInitialCards.slice(0, requiredPairs);
     cards.value = [...cardsToUse, ...cardsToUse.map(card => ({ ...card }))].sort(() => Math.random() - 0.5);
-    }
   };
 
   // Card flip logic
@@ -199,18 +186,6 @@
     }
   };
 
-
-  const lockInteraction = () => {
-  isLocked.value = true;
-
-  // Clear any existing lock timeout
-  if (lockTimeout) clearTimeout(lockTimeout);
-
-  // Set a new lock timeout
-  lockTimeout = setTimeout(() => {
-    lockBoard.value = false; // Unlock after the duration
-  }, lockDuration);
-};
 
   onMounted( async () => {
     await getBoard();
