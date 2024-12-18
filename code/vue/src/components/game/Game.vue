@@ -46,8 +46,8 @@
     total_time: 0,
     total_turns_winner: 0,
     board_id: boardId,
-    first_card_timestamp : 0,
-    last_card_timestamp : 0,
+    began_at : 0,
+    ended_at : 0,
   });
 
 
@@ -171,8 +171,8 @@
       resultMessage.value = 'Congratulations! You found all the pairs!';
       lastCardTimestamp.value = Date.now();
       gameData.value.total_time = Math.round((lastCardTimestamp.value - firstCardTimestamp.value) / 1000); // Em segundos
-      gameData.value.first_card_timestamp = firstCardTimestamp.value;
-      gameData.value.last_card_timestamp = lastCardTimestamp.value;
+      gameData.value.began_at_timestamp = firstCardTimestamp.value;
+      gameData.value.ended_at = lastCardTimestamp.value;
       gameStore.sendGameData(gameData.value, timer.value, counter.value);
       gameFinished.value = true;
     } else {

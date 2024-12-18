@@ -28,6 +28,9 @@ class GameController extends Controller
         'total_time' => 'nullable|numeric',
         'total_turns_winner' => 'nullable|numeric',
         'board_id' => 'required|exists:boards,id',
+        'began_at' => 'nullable|date',
+        'ended_at' => 'nullable|date',
+
     ]);
 
     // Set created_user_id to the authenticated user's ID

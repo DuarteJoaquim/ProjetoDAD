@@ -19,6 +19,8 @@ class Game extends Model
         'total_turns_winner', //fixed typo
         'total_time',
         'board_id',
+        'began_at',
+        'ended_at',
     ];
 
 
