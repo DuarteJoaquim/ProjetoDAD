@@ -75,47 +75,77 @@ class TransactionController extends Controller
     }
 
     public function purchaseCoins(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'type' => 'required|string|in:MBWAY,PAYPAL,IBAN,MB,VISA',
-                'reference' => 'required|string|max:255',
-                'value' => 'required|integer|min:1',
-            ]);
+{
+    try {
+        $validated = $request->validate([
+            'type' => 'required|string|in:MBWAY,PAYPAL,IBAN,MB,VISA',
+            'reference' => 'required|string|max:255',
+            'coinValue' => 'required|integer|min:1',
+            'euros' => 'required|numeric|min:1',
+        ]);
 
-            $user = $request->user();
+        $user = $request->user();
 
-            $user->brain_coins_balance += $validated['value'];
-            $user->save();
+        // Atualiza o saldo de moedas do usuário
+        $user->brain_coins_balance += $validated['coinValue'];
+        $user->save();
 
-            return response()->json(['coins' => $user->brain_coins_balance], 200);
-        } catch (\Exception $e) {
-            \Log::error('Error on the buying coins process: ' . $e->getMessage());
-            return response()->json(['error' => 'Error buying coins'], 500);
-        }
+        // Cria uma transação na tabela transactions
+        Transaction::create([
+            'transaction_datetime' => now(),
+            'user_id' => $user->id,
+            'game_id' => null, // Não relacionado a um jogo
+            'type' => 'B', // Tipo "B" para compra de coins
+            'euros' => $validated['euros'], // Valor em euros
+            'brain_coins' => $validated['coinValue'], // Coins comprados
+            'payment_type' => $validated['type'],
+            'payment_reference' => $validated['reference'],
+        ]);
+
+        return response()->json(['coins' => $user->brain_coins_balance], 200);
+    } catch (\Exception $e) {
+        \Log::error('Error on the buying coins process: ' . $e->getMessage());
+        return response()->json(['error' => 'Error buying coins'], 500);
     }
+}
 
-    public function spendCoins(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'value' => 'required|integer|min:1',
-            ]);
-            $user = $request->user();
-            
-            if($user->brain_coins_balance < $validated['value']){
-                return response()->json(['error' => 'Not enough coins'], 400);
-            }
 
-            $user->brain_coins_balance -= $validated['value'];
-            $user->save();
+public function spendCoins(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'value' => 'required|integer|min:1',
+        ]);
 
-            return response()->json(['coins' => $user->brain_coins_balance], 200);
-        } catch (\Exception $e) {
-            \Log::error('Error on the spending coins process: ' . $e->getMessage());
-            return response()->json(['error' => 'Error spending coins'], 500);
+        $user = $request->user();
+
+        if ($user->brain_coins_balance < $validated['value']) {
+            return response()->json(['error' => 'Not enough coins'], 400);
         }
+
+        // Deduz o saldo de moedas do usuário
+        $user->brain_coins_balance -= $validated['value'];
+        $user->save();
+
+        // Cria uma transação na tabela transactions
+        Transaction::create([
+            'transaction_datetime' => now(),
+            'user_id' => $user->id,
+            'game_id' => null, // Não relacionado a um jogo
+            'type' => 'P', // Tipo "P" para gasto de coins
+            'euros' => 0, // Não há valor em euros
+            'brain_coins' => -$validated['value'], // Coins gastos (valor negativo)
+            'payment_type' => null, // Não aplicável
+            'payment_reference' => null, // Não aplicável
+        ]);
+
+        return response()->json(['coins' => $user->brain_coins_balance], 200);
+    } catch (\Exception $e) {
+        \Log::error('Error on the spending coins process: ' . $e->getMessage());
+        return response()->json(['error' => 'Error spending coins'], 500);
     }
+}
+
 
     public function destroy($id)
     {
