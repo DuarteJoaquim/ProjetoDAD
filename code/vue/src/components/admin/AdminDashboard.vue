@@ -39,7 +39,7 @@ const goToViewAllTransactions = () => {
         <button class="dashboard-button" @click="goToViewAllGames">
           View All Games
         </button>
-        <button class="dashboard-button" @click="goToViewAllGames">
+        <button class="dashboard-button" @click="goToViewAllTransactions">
           View All transactions
         </button>
         <button class="dashboard-button" @click="goToAdminStats">
