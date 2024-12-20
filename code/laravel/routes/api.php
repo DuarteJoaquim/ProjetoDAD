@@ -7,6 +7,7 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\MultiplayerGameController;
+use App\Http\Controllers\AdminGameController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -27,6 +28,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/multiplayer/create', [MultiplayerGameController::class, 'create']);
     Route::post('/multiplayer/join', [MultiplayerGameController::class, 'join']);
     Route::post('/multiplayer/turn', [MultiplayerGameController::class, 'submitTurn']);
+
+});
+
+Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
+    Route::get('/admin/all-games', [AdminGameController::class, 'allGames']);
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);

@@ -121,7 +121,7 @@ private function isGlobalTop3($boardId, $turns, $time)
 
         $games = Game::with(['creator:id,nickname', 'winner:id,nickname'])
             ->where('created_user_id', $user->id)
-            ->where('games.board_id', '!=', 4)
+            ->where('games.board_id')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

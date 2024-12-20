@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MultiplayerGamePlayed;
 use Illuminate\Http\Request;
 
-class MultiplayerGamePlayedController extends Controller
+class MultiplayerGameController extends Controller
 {
     public function index()
     {
