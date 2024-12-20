@@ -49,49 +49,50 @@ class UserController extends Controller
 
 
     public function deleteUser(Request $request, $id)
-    {
-        // Obter o usuário que será excluído
-        $user = User::firstOrFail($id);
-    
-        // Obter o usuário autenticado
-        $authUser = $request->user();
-    
-        // Regras de exclusão
-        if ($authUser->id === $user->id) {
-            // Usuário autenticado pode excluir sua própria conta
-            return $this->handleUserDeletion($user);
-        }
-    
-        if ($authUser->type !== 'A') {
-            // Usuários normais não podem excluir outros usuários
-            return response()->json(['message' => 'Unauthorized action.'], 403);
-        }
-    
-        if ($user->type === 'A') {
-            // Administradores não podem excluir outros administradores
-            return response()->json(['message' => 'Admins cannot delete other admins.'], 403);
-        }
-    
-        // Admin pode excluir outros usuários
+{
+    // Obter o usuário que será excluído
+    $user = User::findOrFail($id);
+
+    // Obter o usuário autenticado
+    $authUser = $request->user();
+
+    // Regra: Administradores não podem excluir sua própria conta
+    if ($authUser->id === $user->id && $authUser->type === 'A') {
+        return response()->json(['message' => 'Admins cannot delete their own account.'], 403);
+    }
+
+    // Regra: Usuários normais podem excluir suas próprias contas
+    if ($authUser->id === $user->id) {
         return $this->handleUserDeletion($user);
     }
-    
-    private function handleUserDeletion(User $user)
-    {
-        // Verificar se o usuário tem transações ou jogos
-        $hasTransactions = Transaction::where('user_id', $user->id)->exists();
-        $hasGames = Game::where('created_user_id', $user->id)->exists() || Game::where('winner_user_id', $user->id)->exists();
-    
-        if ($hasTransactions || $hasGames) {
-            // Aplicar Soft Delete
-            $user->delete();
-            return response()->json(['message' => 'User has been soft deleted.'], 200);
-        } else {
-            // Eliminar permanentemente
-            $user->forceDelete();
-            return response()->json(['message' => 'User has been permanently deleted.'], 200);
-        }
+
+    // Regra: Apenas administradores podem excluir outras contas
+    if ($authUser->type !== 'A') {
+        return response()->json(['message' => 'Unauthorized action.'], 403);
     }
+
+    // Admin pode excluir outros usuários
+    return $this->handleUserDeletion($user);
+}
+
+private function handleUserDeletion(User $user)
+{
+    // Verificar se o usuário tem transações ou jogos
+    $hasTransactions = Transaction::where('user_id', $user->id)->exists();
+    $hasGames = Game::where('created_user_id', $user->id)->exists() || Game::where('winner_user_id', $user->id)->exists();
+
+    if ($hasTransactions || $hasGames) {
+        // Aplicar Soft Delete
+        $user->delete();
+        return response()->json(['message' => 'User has been soft deleted.'], 200);
+    } else {
+        // Eliminar permanentemente
+        $user->forceDelete();
+        return response()->json(['message' => 'User has been permanently deleted.'], 200);
+    }
+}
+
+
     
 
 }

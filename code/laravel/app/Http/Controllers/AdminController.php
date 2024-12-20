@@ -129,31 +129,6 @@ public function toggleBlockUser(Request $request, $id)
     ]);
 }
 
-public function deleteUser(Request $request, $id)
-{
-    // Encontre o usuário pelo ID
-    $user = User::findOrFail($id);
-
-    // Verificar se é admin
-    if ($user->type === 'A') {
-        return response()->json(['message' => 'Admins cannot delete other admins.'], 403);
-    }
-
-    // Verificar se o usuário tem transações ou jogos
-    $hasTransactions = Transaction::where('user_id', $user->id)->exists();
-    $hasGames = Game::where('created_user_id', $user->id)->exists() || Game::where('winner_user_id', $user->id)->exists();
-
-    if ($hasTransactions || $hasGames) {
-        // Aplicar Soft Delete
-        $user->delete();
-        return response()->json(['message' => 'User has been soft deleted.'], 200);
-    } else {
-        // Eliminar permanentemente
-        $user->forceDelete();
-        return response()->json(['message' => 'User has been permanently deleted.'], 200);
-    }
-}
-
 
 
 }
