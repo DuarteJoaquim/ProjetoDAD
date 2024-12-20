@@ -1,34 +1,34 @@
 <script setup>
-import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { ref } from 'vue';
 
+// Objeto reativo para armazenar os dados do formulário
 const authStore = useAuthStore();
-const name = ref("");
-const email = ref("");
-const password = ref("");
-const nickname = ref("");
+const credentials = ref({
+  name: '',
+  email: '',
+  password: '',
+  nickname: '',
+});
+
 const errors = ref([]);
 const successMessage = ref("");
 
 const registerAdmin = async () => {
-  errors.value = [];
+  errors.value = []; // Reseta os erros
   successMessage.value = "";
 
   try {
-    const response = await authStore.registerAdmin({
-      name: name.value,
-      email: email.value,
-      password: password.value,
-      nickname: nickname.value,
-      type: "A", // Força o tipo para administrador
-    });
+    console.log(credentials.value);
+    const response = await authStore.registerAdmin(credentials.value);
 
     if (response) {
       successMessage.value = "Admin created successfully!";
-      name.value = "";
-      email.value = "";
-      password.value = "";
-      nickname.value = "";
+      // Reseta o formulário
+      credentials.value.name = "";
+      credentials.value.email = "";
+      credentials.value.password = "";
+      credentials.value.nickname = "";
     }
   } catch (err) {
     errors.value = err.response?.data?.errors || ["An error occurred."];
@@ -46,19 +46,19 @@ const registerAdmin = async () => {
     <form @submit.prevent="registerAdmin">
       <div class="form-group">
         <label for="name">Name</label>
-        <input v-model="name" id="name" type="text" required />
+        <input v-model="credentials.name" id="name" type="text" required />
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input v-model="email" id="email" type="email" required />
+        <input v-model="credentials.email" id="email" type="email" required />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input v-model="password" id="password" type="password" required />
+        <input v-model="credentials.password" id="password" type="password" required />
       </div>
       <div class="form-group">
         <label for="nickname">Nickname</label>
-        <input v-model="nickname" id="nickname" type="text" required />
+        <input v-model="credentials.nickname" id="nickname" type="text" required />
       </div>
       <button type="submit">Create Admin</button>
     </form>

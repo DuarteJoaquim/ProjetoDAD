@@ -13,6 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refreshtoken', [AuthController::class, 'refreshToken']);
     Route::put('/auth/updateProfile', [AuthController::class, 'updateProfile']);
+    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 
     Route::get('/users/me', [UserController::class, 'showMe']);
 
@@ -36,6 +37,9 @@ Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
     Route::get('/admin/transactions', [AdminController::class, 'allTransactions']);
     Route::get('/admin/users', [AdminController::class, 'Userindex']);
     Route::post('/auth/register-admin', [AuthController::class, 'registerAdmin']);
+    Route::patch('/users/{id}/toggle-block', [AdminController::class, 'toggleBlockUser']);
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);
