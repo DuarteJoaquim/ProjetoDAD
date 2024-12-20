@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 const router = useRouter();
 const storeAuth = useAuthStore();
 
+// Navegação para diferentes páginas
 const goToNewGame = () => {
   router.push({ name: 'newGame' });
 };
@@ -25,28 +26,45 @@ const goToLobby = () => {
   router.push({ name: "lobby" });
 };
 
+// Navegação para o painel do administrador
+const goToAdminDashboard = () => {
+  router.push({ name: 'admin' });
+};
+
+// Verificação se o utilizador é admin
+const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de utilizador é 'A' (Admin)
+
 </script>
 
 <template>
   <div class="dashboard">
     <h1 class="title">Memory Game</h1>
     <div class="button-container">
-      <button class="dashboard-button" @click="goToNewGame">New Game</button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToLobby">
+      <button v-if="!isAdmin()" class="dashboard-button" @click="goToNewGame">New Game</button>
+      <button v-if="storeAuth.user && !isAdmin()" class="dashboard-button" @click="goToLobby">
         Multiplayer (Lobby)
       </button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToGameHistory">
+      <button v-if="storeAuth.user && !isAdmin()" class="dashboard-button" @click="goToGameHistory">
         Game History
       </button>
       <button class="dashboard-button" @click="goToScoreboard">
         Scoreboard
       </button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToCoins">
+      <button v-if="storeAuth.user && !isAdmin()" class="dashboard-button" @click="goToCoins">
         Coins
+      </button>
+      <!-- Botão para o Admin Dashboard -->
+      <button
+        v-if="isAdmin()"
+        class="dashboard-button admin-button"
+        @click="goToAdminDashboard"
+      >
+        Admin Dashboard
       </button>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .dashboard {

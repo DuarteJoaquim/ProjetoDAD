@@ -208,6 +208,22 @@ export const useAuthStore = defineStore("auth", () => {
     return false;
   };
 
+  const registerAdmin = async (credentials) => {
+    storeError.resetMessages();
+    try {
+      const response = await axios.post("auth/register-admin", credentials);
+      return response.data;
+    } catch (e) {
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        "Admin Registration Error!"
+      );
+      throw e;
+    }
+  };
+
   return {
     user,
     userName,
@@ -223,5 +239,6 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     restoreToken,
     updateProfile,
+    registerAdmin,
   };
 });

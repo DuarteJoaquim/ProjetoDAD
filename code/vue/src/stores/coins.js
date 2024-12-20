@@ -19,18 +19,18 @@ export const useCoinsStore = defineStore('coins', () => {
     }
   };
 
-  const purchaseCoins = async (type, reference, value) => {
+  const purchaseCoins = async (type, reference, coinValue , euros) => {
     try {
-      const payload = { type, reference, value: value / 10 };
+      const payload = { type, reference, value : euros };
       const paymentResponse = await axios.post('https://dad-202425-payments-api.vercel.app/api/debit', payload);
 
       if (paymentResponse.status === 201) {
 
-        const backendPayload = { type, reference, value };
+        const backendPayload = { type, reference, coinValue, euros };
         const response = await axios.post('users/me/coins/purchase', backendPayload);
 
         if (response.status === 200) {
-          gameCoins.value += backendPayload.value;
+          gameCoins.value += backendPayload.coinValue;
 
           router.push('/dashboard');
 

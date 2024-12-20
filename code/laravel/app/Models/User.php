@@ -25,7 +25,11 @@ class User extends Authenticatable
         'photo_filename',
         'brain_coins_balance',
         'photo_url',
+        
+
     ];
+
+    protected $dates = ['deleted_at'];
 
     protected $hidden = [
         'password',

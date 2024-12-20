@@ -20,6 +20,10 @@
         <input v-model="reference" type="text" id="reference" placeholder="Enter payment reference" required />
       </div>
 
+      <div class="amount-to-pay">
+        <p>You will pay: <strong>{{ eurosToPay.toFixed(2) }} €</strong></p>
+      </div>
+
       <div class="form-group">
         <label for="coinValue">Number of Coins (multiples of 10)</label>
         <input v-model.number="coinValue" type="number" id="coinValue" min="10" step="10" placeholder="Enter amount"
@@ -38,6 +42,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useCoinsStore } from '@/stores/coins';
+import { computed } from "vue";
 
 const storeCoins = useCoinsStore();
 
@@ -46,6 +51,9 @@ const reference = ref('');
 const coinValue = ref(10);
 const message = ref('');
 const isSuccess = ref(false);
+
+// Computed para calcular o valor em euros automaticamente
+const eurosToPay = computed(() => coinValue.value / 10); // 10 coins = 1 €
 
 const validatePaymentReference = (type, reference) => {
   const regexes = {
@@ -60,23 +68,30 @@ const validatePaymentReference = (type, reference) => {
 
 
 const buyCoins = async () => {
-
   if (!validatePaymentReference(paymentType.value, reference.value)) {
     message.value = 'Invalid payment reference for the selected method.';
     isSuccess.value = false;
-
     return;
   }
 
   if (coinValue.value <= 0 || coinValue.value % 10 !== 0) {
     message.value = 'Coin value must be a positive multiple of 10.';
     isSuccess.value = false;
-
     return;
   }
 
   try {
-    await storeCoins.purchaseCoins(paymentType.value, reference.value, coinValue.value);
+    
+    // Faz a chamada para comprar moedas
+    const response = await storeCoins.purchaseCoins(
+      paymentType.value, 
+      reference.value, 
+      coinValue.value, 
+      eurosToPay.value
+    );
+
+    storeCoins.gameCoins += coinValue.value; // Atualiza o número de moedas
+    storeCoins.getCoins(); // Atualiza a lista de moedas
 
     message.value = 'Coins purchased successfully!';
     isSuccess.value = true;
@@ -86,6 +101,7 @@ const buyCoins = async () => {
     isSuccess.value = false;
   }
 };
+
 
 </script>
 
