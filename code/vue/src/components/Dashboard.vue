@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 const router = useRouter();
 const storeAuth = useAuthStore();
 
+// Navegação para diferentes páginas
 const goToNewGame = () => {
   router.push({ name: 'newGame' });
 };
@@ -25,6 +26,13 @@ const goToLobby = () => {
   router.push({ name: "lobby" });
 };
 
+// Navegação para o painel do administrador
+const goToAdminDashboard = () => {
+  router.push({ name: 'admin' });
+};
+
+// Verificação se o utilizador é admin
+const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de utilizador é 'A' (Admin)
 </script>
 
 <template>
@@ -44,9 +52,18 @@ const goToLobby = () => {
       <button v-if="storeAuth.user" class="dashboard-button" @click="goToCoins">
         Coins
       </button>
+      <!-- Botão para o Admin Dashboard -->
+      <button
+        v-if="isAdmin()"
+        class="dashboard-button admin-button"
+        @click="goToAdminDashboard"
+      >
+        Admin Dashboard
+      </button>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .dashboard {

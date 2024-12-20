@@ -1,11 +1,12 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-
+import { useRouter } from 'vue-router'
 // Dados reativos
 const games = ref([]);
 const pagination = ref({});
 const error = ref(null);
+const router = useRouter();
 
 // Filtros reativos
 const typeFilter = ref('all'); // Filtro por tipo
@@ -48,6 +49,11 @@ const viewGameDetails = (game) => {
   console.log('Game details:', game);
 };
 
+// Função para voltar para a página anterior
+const goBack = () => {
+  router.back(); // Usa o histórico do navegador para voltar
+};
+
 // Buscar os jogos na montagem do componente
 fetchGames();
 </script>
@@ -56,6 +62,8 @@ fetchGames();
 
 <template>
     <div class="view-container">
+        <!-- Botão para voltar -->
+        <button class="back-button" @click="goBack">Back</button>
       <h1>View All Games</h1>
   
       <!-- Exibição de erro, se houver -->
