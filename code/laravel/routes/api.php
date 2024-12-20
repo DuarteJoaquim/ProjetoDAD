@@ -48,8 +48,6 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/boards', [BoardController::class, 'index']);
 Route::post('/board', [BoardController::class, 'board']);
 
-Route::get('/scoreboard/global3por4', [GameController::class, 'globalScoreboard_3por4']);
-Route::get('/scoreboard/global4por4', [GameController::class, 'globalScoreboard_4por4']);
-Route::get('/scoreboard/global6por6', [GameController::class, 'globalScoreboard_6por6']);
+Route::get('/scoreboard', [GameController::class, 'globalScoreboard']);
 
 

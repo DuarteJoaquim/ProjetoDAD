@@ -13,9 +13,7 @@
   const personalScores = ref([]);
 
   // Global Scoreboard Data
-  const globalScores3by4 = ref([]);
-  const globalScores4by4 = ref([]);
-  const globalScores6by6 = ref([]);
+  const globalScores = ref({});
 
 
 
@@ -47,33 +45,21 @@
   };
 
   // Fetch Global Scoreboard Data
-  const fetchGlobalScores3by4 = async () => {
-    try {
-      const response = await axios.get('/scoreboard/global3por4');
-      globalScores3by4.value = response.data;     
-    } catch (error) {
-      console.error("Error fetching Global Scoreboard data", error);
-    }
-  };
+  // Função genérica para buscar o scoreboard
+const fetchGlobalScores = async (cols, rows) => {
+  try {
+    const response = await axios.get(`scoreboard?cols=${cols}&rows=${rows}`);
+    globalScores.value[`${cols}x${rows}`] = response.data; // Armazena os dados usando "colsxrows" como chave
+  } catch (error) {
+    console.error(`Error fetching Global Scoreboard data for ${cols}x${rows}`, error);
+  }
+};
 
-  const fetchGlobalScores4by4 = async () => {
-    try {
-      const response = await axios.get('/scoreboard/global4por4');
-      globalScores4by4.value = response.data;
-      console.log("Global Scores 4 by 4:", response.data);
-    } catch (error) {
-      console.error("Error fetching Global Scoreboard data", error);
-    }
-  };
-
-  const fetchGlobalScores6by6 = async () => {
-    try {
-      const response = await axios.get('/scoreboard/global6por6');
-      globalScores6by6.value = response.data;
-    } catch (error) {
-      console.error("Error fetching Global Scoreboard data", error);
-    }
-  };
+const loadAllGlobalScores = async () => {
+  await fetchGlobalScores(3, 4);
+  await fetchGlobalScores(4, 4);
+  await fetchGlobalScores(6, 6);
+};
 
   // Function to determine the medal background color based on the rank
   const getMedalStyle = (index) => {
@@ -91,9 +77,7 @@
   onMounted(() => {
     fetchMultiplayerLeaderboard();
     fetchPersonalScores();
-    fetchGlobalScores3by4();
-    fetchGlobalScores4by4();
-    fetchGlobalScores6by6();
+    loadAllGlobalScores();
   });
   
 </script>
@@ -159,9 +143,9 @@
 
     <hr v-if="storeAuth.user" />
 
-    <!-- Global Scoreboard 3x4 -->
-    <div class="global-scoreboard">
-      <h2>Global Leaderboard 3x4</h2>
+    <!-- Global Scoreboards -->
+    <div v-for="(scores, boardSize) in globalScores" :key="boardSize" class="global-scoreboard">
+      <h2>Global Leaderboard {{ boardSize }}</h2>
       <table>
         <thead>
           <tr>
@@ -172,66 +156,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="globalScores3by4.length === 0">
-            <td colspan="5" class="no-data">No global scores available</td>
+          <tr v-if="!scores || scores.length === 0">
+            <td colspan="4" class="no-data">No global scores available for {{ boardSize }}</td>
           </tr>
-          <tr v-else v-for="(score, index) in globalScores3by4" :key="score.boardSize + score.player">
-            <td :style="getMedalStyle(index)">{{ index + 1 }}</td>
-            <td>{{ score.player }}</td>
-            <td>{{ score.bestTime }} seconds</td>
-            <td>{{ score.fewestTurns }} turns</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <hr />
-
-    <!-- Global Scoreboard 4x4 -->
-    <div class="global-scoreboard">
-      <h2>Global Leaderboard 4x4</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Player</th>
-            <th>Best Time</th>
-            <th>Fewest Turns</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="globalScores4by4.length === 0">
-            <td colspan="5" class="no-data">No global scores available</td>
-          </tr>
-          <tr v-else v-for="(score, index) in globalScores4by4" :key="score.boardSize + score.player">
-            <td :style="getMedalStyle(index)">{{ index + 1 }}</td>
-            <td>{{ score.player }}</td>
-            <td>{{ score.bestTime }} seconds</td>
-            <td>{{ score.fewestTurns }} turns</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <hr />
-
-    <!-- Global Scoreboard 6x6 -->
-    <div class="global-scoreboard">
-      <h2>Global Leaderboard 6x6</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Player</th>
-            <th>Best Time</th>
-            <th>Fewest Turns</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="globalScores6by6.length === 0">
-            <td colspan="5" class="no-data">No global scores available</td>
-          </tr>
-          <tr v-else v-for="(score, index) in globalScores6by6" :key="score.boardSize + score.player">
+          <tr v-else v-for="(score, index) in scores" :key="score.player + index">
             <td :style="getMedalStyle(index)">{{ index + 1 }}</td>
             <td>{{ score.player }}</td>
             <td>{{ score.bestTime }} seconds</td>
