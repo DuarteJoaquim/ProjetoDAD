@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -83,6 +84,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Unauthorized.'], 403);
     }
 
+    // Validação dos dados
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
@@ -90,16 +92,27 @@ class AuthController extends Controller
         'nickname' => 'required|string|max:20',
     ]);
 
+    // Criptografar a senha
     $validated['password'] = bcrypt($validated['password']);
-    $validated['type'] = 'A'; // Define o tipo como administrador
 
-    $user = User::create($validated);
+    // Garantir que o tipo seja 'A'
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => $validated['password'],
+        'nickname' => $validated['nickname'],
+        'type' => 'A', // Aqui garantimos que o tipo será 'A'
+    ]);
+
+        // Log do valor de `type`
+        Log::info('Creating admin user with type:', ['type' => $user->type]);
 
     return response()->json([
         'message' => 'Admin created successfully.',
         'user' => $user,
     ], 201);
 }
+
 
     
     public function updateProfile(UpdateUserRequest $request)

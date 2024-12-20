@@ -15,7 +15,7 @@ const registerAdmin = async () => {
   successMessage.value = "";
 
   try {
-    const response = await authStore.register({
+    const response = await authStore.registerAdmin({
       name: name.value,
       email: email.value,
       password: password.value,
