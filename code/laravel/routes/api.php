@@ -19,6 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/scoreboard/personal', [GameController::class, 'personalScoreboard']);
     Route::get('/game/gamehistory', [GameController::class, 'gamehistory']);
+    Route::get('/transactions/history', [TransactionController::class, 'userTransactionHistory']);
     
     Route::get('/users/me/coins', [TransactionController::class, 'getCoins']);
     Route::post('/users/me/coins/purchase', [TransactionController::class, 'purchaseCoins']);

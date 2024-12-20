@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
+
 const storeAuth = useAuthStore();
 const router = useRouter();
 
@@ -18,6 +19,10 @@ const newCredentials = computed(() => ({
   password: '',
   confirmPassword: '',
 }));
+
+const goToTransactionHistory = () => {
+  router.push({ name: 'transactionHistory' });
+};
 
 const updateProfile = () => {
   storeAuth.updateProfile(newCredentials.value);
@@ -79,6 +84,9 @@ const deleteAccount = async () => {
       </form>
     </CardContent>
     <CardFooter class="flex justify-between px-6 pb-6">
+      <Button @click="goToTransactionHistory" class="mr-2">
+        View Transaction History
+      </Button>
       <Button @click="updateProfile">Update profile</Button>
       <Button class="bg-red-600 hover:bg-red-700 text-white" @click="deleteAccount">Delete Account</Button>
     </CardFooter>

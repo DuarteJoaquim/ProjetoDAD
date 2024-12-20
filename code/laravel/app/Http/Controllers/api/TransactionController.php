@@ -41,6 +41,24 @@ class TransactionController extends Controller
         return response()->json($transaction);
     }
 
+    public function userTransactionHistory(Request $request)
+{
+    try {
+        $user = $request->user();
+
+        // Obter transações do usuário
+        $transactions = Transaction::where('user_id', $user->id)
+            ->with(['game:id,type'])
+            ->orderBy('transaction_datetime', 'desc')
+            ->paginate(10); // Paginação
+
+        return response()->json($transactions);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching transaction history: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to fetch transaction history.'], 500);
+    }
+}
+
 
     public function update(Request $request, $id)
     {

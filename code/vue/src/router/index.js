@@ -14,6 +14,7 @@ import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
 import AdminDashboard from '@/components/admin/AdminDashboard.vue'; // Importar o componente AdminDashboard para a rota
+import TransactionHistory from '@/components/user/TransactionHistory.vue';
 
 
 const router = createRouter({
@@ -43,6 +44,10 @@ const router = createRouter({
 
     {path: '/admin/create-admin',name: 'createAdmin',component: () => import('@/components/admin/CreateAdmin.vue'),},
     
+    // Rota para Users
+    
+    { path: '/transactions/history', name: 'transactionHistory', component: TransactionHistory },
+
     {
       path: '/multi',
       name: 'multiPlayerGames',
