@@ -75,6 +75,32 @@ class AuthController extends Controller
 
         return new UserResource($user);
     }
+
+    public function registerAdmin(Request $request)
+{
+    // Verificar se o usuário autenticado é administrador
+    if ($request->user()->type !== 'A') {
+        return response()->json(['message' => 'Unauthorized.'], 403);
+    }
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8',
+        'nickname' => 'required|string|max:20',
+    ]);
+
+    $validated['password'] = bcrypt($validated['password']);
+    $validated['type'] = 'A'; // Define o tipo como administrador
+
+    $user = User::create($validated);
+
+    return response()->json([
+        'message' => 'Admin created successfully.',
+        'user' => $user,
+    ], 201);
+}
+
     
     public function updateProfile(UpdateUserRequest $request)
     {

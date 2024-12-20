@@ -34,6 +34,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
     Route::get('/admin/all-games', [AdminController::class, 'allGames']);
     Route::get('/admin/transactions', [AdminController::class, 'allTransactions']);
+    Route::get('/admin/users', [AdminController::class, 'Userindex']);
+    Route::post('/auth/register-admin', [AuthController::class, 'registerAdmin']);
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);

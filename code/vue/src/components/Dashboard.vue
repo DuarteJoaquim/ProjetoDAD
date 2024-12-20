@@ -39,17 +39,17 @@ const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de uti
   <div class="dashboard">
     <h1 class="title">Memory Game</h1>
     <div class="button-container">
-      <button class="dashboard-button" @click="goToNewGame">New Game</button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToLobby">
+      <button v-if="!isAdmin()" class="dashboard-button" @click="goToNewGame">New Game</button>
+      <button v-if="storeAuth.user & !isAdmin()" class="dashboard-button" @click="goToLobby">
         Multiplayer (Lobby)
       </button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToGameHistory">
+      <button v-if="storeAuth.user & !isAdmin()" class="dashboard-button" @click="goToGameHistory">
         Game History
       </button>
       <button class="dashboard-button" @click="goToScoreboard">
         Scoreboard
       </button>
-      <button v-if="storeAuth.user" class="dashboard-button" @click="goToCoins">
+      <button v-if="storeAuth.user & !isAdmin()" class="dashboard-button" @click="goToCoins">
         Coins
       </button>
       <!-- Botão para o Admin Dashboard -->

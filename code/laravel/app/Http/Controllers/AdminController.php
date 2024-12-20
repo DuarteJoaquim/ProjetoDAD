@@ -4,9 +4,28 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\User;
 
 class AdminController extends Controller
 {
+    public function Userindex(Request $request)
+    {
+        $query = User::query();
+
+        // Excluir usuários soft deleted
+        $query->whereNull('deleted_at');
+
+        // Filtros opcionais (se necessário)
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+        }
+
+        // Paginação
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return response()->json($users);
+    }
     /**
      * Retorna todos os jogos apenas para administradores.
      */
