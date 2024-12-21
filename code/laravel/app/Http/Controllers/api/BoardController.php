@@ -11,16 +11,37 @@ class BoardController extends Controller
 {
     
     public function index(Request $request)
-    {
-        
-        if ($request->bool == 'true') {
-            return Board::where('board_cols', 3)
-                    ->where('board_rows', 4)
-                    ->get();
-        }
-        
-        return Board::all();
+{
+    // Converte o parâmetro `bool` para booleano
+    $isTrue = filter_var($request->input('bool', false), FILTER_VALIDATE_BOOLEAN);
+    $additional = $request->input('additional', null); // Parâmetro opcional
+
+    // Lógica para o parâmetro adicional
+    if ($additional) {
+        // Inicia uma query
+        $query = Board::query();
+
+        // Exclui o tabuleiro 3x4
+        $query->whereNot(function ($q) {
+            $q->where('board_cols', 3)
+              ->where('board_rows', 4);
+        });
+
+        return $query->get(); // Retorna o resultado da query
     }
+
+    // Lógica para o parâmetro bool
+    if ($isTrue) {
+        return Board::where('board_cols', 3)
+            ->where('board_rows', 4)
+            ->get();
+    }
+
+    // Retorna todas as boards por padrão
+    return Board::all();
+}
+
+
 
     public function board(Request $request)
     {

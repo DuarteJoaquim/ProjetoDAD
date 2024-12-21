@@ -34,8 +34,6 @@
   const firstCardTimestamp = ref(null);
   const lastCardTimestamp = ref(null);
   
-  const cols = ref();
-  const rows = ref();
   
   gameStore.hintsUsed = 0; // Reinicia o contador de dicas
   gameStore.hintPairsRevealed = [];
@@ -83,21 +81,12 @@
   ]);
 
 
-  const getBoard = async () => {
-    try {
-      const response = await axios.post('/board', {id: boardId} );
-      cols.value = response.data.board_cols;
-      rows.value = response.data.board_rows;
-    } catch (error) {
-      console.error('Error fetching boards:', error);
-    }
-  };
-
-
   // Generate the cards based on board dimensions
   const generateCards = () => {
 
-    const totalCards = cols.value * rows.value;
+    const totalCards = gameStore.cols * gameStore.rows;
+
+
     const requiredPairs = Math.floor(totalCards / 2);
 
     if (requiredPairs > initialCards.value.length) {
@@ -187,11 +176,14 @@
   };
 
 
-  onMounted( async () => {
-    await getBoard();
-    generateCards();
-  });
-
+  onMounted(async () => {
+  try {
+    await gameStore.getBoard(boardId); // Chama diretamente a store no onMounted
+    generateCards(); // Gera as cartas após obter as dimensões
+  } catch (error) {
+    console.error("Erro ao inicializar o tabuleiro:", error);
+  }
+});
 
   const playAgain = () => {
   cards.value.forEach(card => {
@@ -232,7 +224,7 @@ const goToHome = () => {
     <h3>Número de jogadas: <span>{{ counter }}</span></h3>
     <h3>Tempo decorrido: <span>{{ timer }}</span>s</h3>
 
-    <div class="board" :style="`grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, auto);`">
+    <div class="board" :style="`grid-template-columns: repeat(${gameStore.cols}, 1fr); grid-template-rows: repeat(${gameStore.rows}, auto);`">
       <div
         v-for="(card, index) in cards"
         :key="index"

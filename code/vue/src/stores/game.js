@@ -14,6 +14,9 @@ export const useGameStore = defineStore("game", () => {
   const maxHints = ref(3); // Máximo de dicas permitidas por jogo
   const hintPairsRevealed = ref([]); // Armazena pares revelados por dicas
 
+  const cols = ref(null);
+  const rows = ref(null);
+
 
   const { toast } = useToast();
 
@@ -163,6 +166,40 @@ export const useGameStore = defineStore("game", () => {
     clearInterval(timerInterval.value);
   };
 
+  // Fetch boards from backend API
+  const fetchBoards = async (isLooged, additionalParam = null) => {
+    try {
+      // Monta os parâmetros dinamicamente
+      const params = { bool: isLooged };
+      if (additionalParam !== null) {
+        params.additional = additionalParam; // Adiciona o parâmetro opcional se estiver definido
+      }
+  
+      // Faz a requisição com os parâmetros
+      const response = await axios.get('/boards', { params });
+      return response.data.filter((board) => board.id); // Filtra apenas boards válidos
+    } catch (error) {
+      console.error('Error fetching boards:', error);
+      return [];
+    }
+  };
+
+  // Busca dados de uma board específica
+  const getBoard = async (boardId) => {
+    try {
+      const response = await axios.post("/board", { id: boardId });
+      cols.value = response.data.board_cols;
+      rows.value = response.data.board_rows;
+    } catch (error) {
+      console.error("Error fetching board details:", error);
+    }
+  };
+
+  
+
+  
+  
+
   return {
     sendGameData,
     useHint,
@@ -171,5 +208,9 @@ export const useGameStore = defineStore("game", () => {
     formatDateTime,
     startTimer,
     stopTimer,
+    fetchBoards,
+    getBoard,
+    cols,
+    rows
   };
 });

@@ -1,31 +1,21 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
 import { useCoinsStore } from '@/stores/coins';
+import { useGameStore } from "@/stores/game";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
-const storeAuth = useAuthStore();
 const storeCoins = useCoinsStore();
+const storeGame = useGameStore();
+const storeAuth = useAuthStore();
 
+
+const isLogged = ref(false);
 // State
 const isOpen = ref(false);
 const boards = ref([]);
 const selectedBoard = ref(null);
-
-// Fetch boards from backend API
-const fetchBoards = async () => {
-  try {
-    const bool = ref(storeAuth.user == null);
-    const response = await axios.get('/boards', {
-      params: { bool: bool.value },
-    });
-    boards.value = response.data.filter((board) => board.id !== 4);
-  } catch (error) {
-    console.error('Error fetching boards:', error);
-  }
-};
 
 // Dropdown methods
 const toggleDropdown = () => {
@@ -55,7 +45,13 @@ const startGame = () => {
   });
 };
 
-onMounted(fetchBoards);
+onMounted(async () => {
+  try {
+    boards.value = await storeGame.fetchBoards(!storeAuth.user); // Atribui os tabuleiros retornados pela função
+  } catch (error) {
+    console.error("Error fetching boards in newgame.vue:", error);
+  }
+});
 </script>
 
 <template>
