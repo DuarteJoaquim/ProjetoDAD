@@ -26,12 +26,10 @@ const goToLobby = () => {
   router.push({ name: "lobby" });
 };
 
-<<<<<<< HEAD
 const goToGeneralStatistics = () => {
   router.push({ name: "generalStatistics" });
 };
 
-=======
 // Navegação para o painel do administrador
 const goToAdminDashboard = () => {
   router.push({ name: 'admin' });
@@ -40,7 +38,6 @@ const goToAdminDashboard = () => {
 // Verificação se o utilizador é admin
 const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de utilizador é 'A' (Admin)
 
->>>>>>> eee742ff3bd85c96fc9a01a0a3bb1ddc9faf4d63
 </script>
 
 <template>
@@ -60,19 +57,9 @@ const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de uti
       <button v-if="storeAuth.user && !isAdmin()" class="dashboard-button" @click="goToCoins">
         Coins
       </button>
-<<<<<<< HEAD
       <!-- Botão para Estatísticas Gerais -->
       <button class="dashboard-button" @click="goToGeneralStatistics">
         General Statistics
-=======
-      <!-- Botão para o Admin Dashboard -->
-      <button
-        v-if="isAdmin()"
-        class="dashboard-button admin-button"
-        @click="goToAdminDashboard"
-      >
-        Admin Dashboard
->>>>>>> eee742ff3bd85c96fc9a01a0a3bb1ddc9faf4d63
       </button>
     </div>
   </div>

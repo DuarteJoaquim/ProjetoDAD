@@ -13,13 +13,9 @@ import Lobby from "@/components/game/Lobby.vue";
 import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
-<<<<<<< HEAD
 import GeneralStatistics from "@/views/GeneralStatistics.vue";
-=======
 import AdminDashboard from '@/components/admin/AdminDashboard.vue'; // Importar o componente AdminDashboard para a rota
 import TransactionHistory from '@/components/user/TransactionHistory.vue';
-
->>>>>>> eee742ff3bd85c96fc9a01a0a3bb1ddc9faf4d63
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

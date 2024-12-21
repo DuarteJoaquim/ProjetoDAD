@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Game;
+use Illuminate\Support\Facades\Log;
 
 class StatisticsController extends Controller
 {
@@ -46,7 +47,7 @@ class StatisticsController extends Controller
 
             return response()->json($data);
         } catch (\Exception $e) {
-            \Log::error('Erro no método podiumByMoves: ' . $e->getMessage());
+            Log::error('Erro no método podiumByMoves: ' . $e->getMessage());
             return response()->json(['error' => 'Erro ao buscar pódio por moves.'], 500);
         }
     }
