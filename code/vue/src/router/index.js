@@ -14,6 +14,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
 import AdminDashboard from '@/components/admin/AdminDashboard.vue'; // Importar o componente AdminDashboard para a rota
 import TransactionHistory from '@/components/user/TransactionHistory.vue';
+import GlobalStats from '@/components/stats/GlobalStats.vue';
 
 
 const router = createRouter({
@@ -45,6 +46,8 @@ const router = createRouter({
     // Rota para Users
     
     { path: '/transactions/history', name: 'transactionHistory', component: TransactionHistory },
+
+    {path: '/stats/global-stats',name: 'globalStats',component: GlobalStats},
 
     {
       path: '/multi',

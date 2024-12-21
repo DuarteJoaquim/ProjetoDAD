@@ -8,6 +8,7 @@ use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\MultiplayerGameController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\api\StatsController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -56,5 +57,7 @@ Route::post('/board', [BoardController::class, 'board']);
 Route::get('/scoreboard', [GameController::class, 'globalScoreboard']);
 Route::get('/scoreboard/multiplayer', [GameController::class, 'globalMultiplayerScoreboard']);
 
+//Stats
+Route::get('/stats/global', [StatsController::class, 'globalStats']);
 
 

@@ -26,6 +26,10 @@ const goToLobby = () => {
   router.push({ name: "lobby" });
 };
 
+const goToGlobalStats = () => {
+  router.push({ name: 'globalStats' });
+};
+
 // Navegação para o painel do administrador
 const goToAdminDashboard = () => {
   router.push({ name: 'admin' });
@@ -49,6 +53,9 @@ const isAdmin = () => storeAuth.user?.type === 'A'; // Verifica se o tipo de uti
       </button>
       <button class="dashboard-button" @click="goToScoreboard">
         Scoreboard
+      </button>
+      <button class="dashboard-button" @click="goToGlobalStats">
+        Global Stats
       </button>
       <button v-if="storeAuth.user && !isAdmin()" class="dashboard-button" @click="goToCoins">
         Coins
