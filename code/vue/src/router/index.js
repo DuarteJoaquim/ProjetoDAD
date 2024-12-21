@@ -13,11 +13,15 @@ import Lobby from "@/components/game/Lobby.vue";
 import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
+import GeneralStatistics from "@/views/GeneralStatistics.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', name: 'dashboard', component: Dashboard },
+    { path: "/general-statistics", name: "generalStatistics", component: GeneralStatistics },
+    { path: '/podium/time', name: 'PodiumTime', component: () => import('@/views/PodiumTime.vue'),},
+    { path: "/podium/moves", name: "PodiumMoves", component: () => import("@/views/PodiumMoves.vue") },
     { path: "/login", name: "login", component: Login },
     { path: "/register", name: "register", component: Register },
     { path: "/userProfile", name: "userProfile", component: UserProfile },

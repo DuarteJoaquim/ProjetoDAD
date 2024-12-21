@@ -33,7 +33,13 @@ const logout = () => {
       <router-link to="/" class="header-link">
         <h1 class="header-title">Memory Game</h1>
       </router-link>
+      <ul class="nav-links">
+        <li><router-link to="/general-statistics" active-class="active">Estatísticas</router-link></li>
+        <li><router-link to="/podium/time" active-class="active">Pódios por Tempo</router-link></li>
+        <li><router-link to="/podium/moves" active-class="active">Pódios por Moves</router-link></li>
+      </ul>
     </div>
+
 
     <!-- Centro -->
     <div class="header-center">
@@ -105,7 +111,8 @@ const logout = () => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid #5763D6; /* Destaque */
+  border: 2px solid #5763D6;
+  /* Destaque */
 }
 
 .user-link {
@@ -186,4 +193,35 @@ const logout = () => {
     font-size: 1.5rem;
   }
 }
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin-left: 20px;
+}
+
+.nav-links li {
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-links li a:hover {
+  color: #20c997;
+}
+
+.nav-links li a.active {
+  background-color: #20c997;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
 </style>

@@ -25,6 +25,10 @@ const goToLobby = () => {
   router.push({ name: "lobby" });
 };
 
+const goToGeneralStatistics = () => {
+  router.push({ name: "generalStatistics" });
+};
+
 </script>
 
 <template>
@@ -44,9 +48,14 @@ const goToLobby = () => {
       <button v-if="storeAuth.user" class="dashboard-button" @click="goToCoins">
         Coins
       </button>
+      <!-- Botão para Estatísticas Gerais -->
+      <button class="dashboard-button" @click="goToGeneralStatistics">
+        General Statistics
+      </button>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .dashboard {

@@ -23,8 +23,9 @@ class Game extends Model
         'ended_at',
     ];
 
+    protected $appends = ['player_name', 'board_size'];
 
-    public function transactions():HasMany
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'game_id', 'id');
     }
@@ -36,7 +37,7 @@ class Game extends Model
     }
 
 
-    public function multiplayerGamesPlayed():HasMany
+    public function multiplayerGamesPlayed(): HasMany
     {
         return $this->hasMany(MultiplayerGamePlayed::class, 'game_id', 'id');
     }
@@ -52,5 +53,16 @@ class Game extends Model
     {
         return $this->belongsTo(User::class, 'winner_user_id');
     }
-    
+
+    public function getPlayerNameAttribute()
+    {
+        // Associa o ID do vencedor ao nome do usuário
+        return $this->winner ? $this->winner->name : 'N/A';
+    }
+
+    public function getBoardSizeAttribute()
+    {
+        // Recupera o tamanho do tabuleiro associado ao jogo
+        return $this->board ? $this->board->size : 'N/A';
+    }
 }

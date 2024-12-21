@@ -17,8 +17,22 @@ class Board extends Model
         'board_rows',
     ];
 
-    public function games():HasMany
+    // Adiciona atributos calculados
+    protected $appends = ['size'];
+
+    /**
+     * Relação com Jogos
+     */
+    public function games(): HasMany
     {
         return $this->hasMany(Game::class, 'board_id', 'id');
+    }
+
+    /**
+     * Atributo Personalizado: Tamanho do Tabuleiro
+     */
+    public function getSizeAttribute(): string
+    {
+        return "{$this->board_rows}x{$this->board_cols}";
     }
 }
