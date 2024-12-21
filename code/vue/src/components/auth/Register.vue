@@ -31,47 +31,156 @@
 </script>
 
 <template>
-  <Card class="w-[450px] mx-auto my-8 p-4 px-8">
-    <CardHeader>
-      <CardTitle>Register</CardTitle>
-      <CardDescription>Enter your credentials to access your account.</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <form>
-        <div class="grid items-center w-full gap-4">
-          <div class="flex flex-col space-y-1.5">
-            <Label for="name">name</Label>
-            <Input id="name" type="name" placeholder="User name"  v-model="credentials.name"/>
-            <ErrorMessage v-if="storeAuth.errorsRegister.name" :errorMessage="storeAuth.errorsRegister.name" > </ErrorMessage>
+  <div class="container">
+    <Card class="card w-[450px] mx-auto my-8 p-4 px-8">
+      <CardHeader class="card-header">
+        <CardTitle class="card-title">Register</CardTitle>
+        <CardDescription class="card-description">Enter your credentials to access your account.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div class="grid items-center w-full gap-4">
+            <div class="flex flex-col space-y-1.5">
+              <Label for="name">Nome Completo</Label>
+              <Input id="name" type="name" placeholder="User name"  v-model="credentials.name"/>
+              <ErrorMessage v-if="storeAuth.errorsRegister.name" :errorMessage="storeAuth.errorsRegister.name" > </ErrorMessage>
+            </div>
+            <div class="flex flex-col space-y-1.5">
+              <Label for="email">Email</Label>
+              <Input id="email" type="email" placeholder="User Email"  v-model="credentials.email"/>
+              <ErrorMessage v-if="storeAuth.errorsRegister.email" :errorMessage="storeAuth.errorsRegister.email" > </ErrorMessage>
+            </div>
+            <div class="flex flex-col space-y-1.5">
+              <Label for="nickname">Nickname</Label>
+              <Input id="nickname" type="name" placeholder="User nickname"  v-model="credentials.nickname"/>
+              <ErrorMessage v-if="storeAuth.errorsRegister.nickname" :errorMessage="storeAuth.errorsRegister.nickname" > </ErrorMessage>
+            </div>
+            <div class="flex flex-col space-y-1.5">
+              <Label for="password">Password</Label>
+              <Input id="password" type="password" v-model="credentials.password"/>
+              <ErrorMessage v-if="storeAuth.errorsRegister.password" :errorMessage="storeAuth.errorsRegister.password" > </ErrorMessage>
+            </div>
           </div>
-          <div class="flex flex-col space-y-1.5">
-            <Label for="email">Email</Label>
-            <Input id="email" type="email" placeholder="User Email"  v-model="credentials.email"/>
-            <ErrorMessage v-if="storeAuth.errorsRegister.email" :errorMessage="storeAuth.errorsRegister.email" > </ErrorMessage>
-          </div>
-          <div class="flex flex-col space-y-1.5">
-            <Label for="nickname">Nickname</Label>
-            <Input id="nickname" type="name" placeholder="User nickname"  v-model="credentials.nickname"/>
-            <ErrorMessage v-if="storeAuth.errorsRegister.nickname" :errorMessage="storeAuth.errorsRegister.nickname" > </ErrorMessage>
-          </div>
-          <div class="flex flex-col space-y-1.5">
-            <Label for="password">Password</Label>
-            <Input id="password" type="password" v-model="credentials.password"/>
-            <ErrorMessage v-if="storeAuth.errorsRegister.password" :errorMessage="storeAuth.errorsRegister.password" > </ErrorMessage>
-          </div>
-        </div>
-      </form>
-    </CardContent>
-    <CardFooter class="flex justify-between px-6 pb-6">
-        <Button variant="outline" @click="goToDashboard">
-            Dashboard
-        </Button>
-        <Button @click="goToLogin">
-            Login
-        </Button>
-        <Button @click="register">
-            Register
-        </Button>
-    </CardFooter>
-  </Card>
+        </form>
+      </CardContent>
+      <CardFooter class="flex justify-between px-6 pb-6">
+          <Button class="dash-button" variant="outline" @click="goToDashboard">
+              Dashboard
+          </Button>
+          <Button @click="goToLogin">
+              Login
+          </Button>
+          <Button @click="register">
+              Register
+          </Button>
+      </CardFooter>
+    </Card>
+  </div>
 </template>
+
+<style scoped>
+
+.container {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.918); /* Fundo preto opaco */
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgb(80, 80, 80); /* Borda cinza escura */
+  border-radius: 6px;
+  background: rgb(245, 244, 244); /* Fundo escuro */
+  color: rgba(0, 0, 0, 0.788); /* Texto claro */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra interna */
+  transition: border-color 0.2s ease-in-out;
+}
+
+input:focus {
+  border-color: rgba(0, 0, 0, 0.966); /* Borda azul ao focar */
+  outline: none;
+}
+
+button {
+  padding: 10px 20px;
+  background: linear-gradient(145deg, rgb(50, 50, 50), rgb(70, 70, 70)); /* Gradiente cinza escuro */
+  color: white; /* Texto branco */
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); /* Sombra */
+}
+
+button:hover {
+  background: linear-gradient(145deg, rgb(70, 70, 70), rgb(50, 50, 50)); /* Inversão do gradiente */
+  transform: translateY(-2px); /* Efeito de elevação */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.6); /* Sombra mais intensa */
+}
+
+button:disabled {
+  background: rgb(80, 80, 80); /* Cor desativada */
+  color: rgb(120, 120, 120);
+  cursor: not-allowed;
+}
+
+.dash-button {
+  background: linear-gradient(145deg, rgb(30, 144, 255), rgb(0, 123, 255)); /* Gradiente azul */
+}
+
+.dash-button:hover {
+  background: linear-gradient(145deg, rgb(0, 123, 255), rgb(30, 144, 255)); /* Gradiente invertido */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card {
+  background: rgb(30, 30, 30); /* Fundo cinza escuro */
+  border: 1px solid rgb(50, 50, 50); /* Borda escura */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra */
+  padding: 20px;
+  margin: 10px auto;
+}
+
+.card-header {
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: rgb(220, 220, 220); /* Texto claro */
+}
+
+.card-title {
+  font-size: 2.5rem;
+}
+
+.card-description {
+  margin-top: 4%;
+  font-size: 0.9rem;
+  color: rgb(221, 218, 218); /* Texto claro */
+  text-align: center;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid rgb(50, 50, 50); /* Separador escuro */
+}
+
+label {
+  font-weight: bold;
+  color: rgb(200, 200, 200); /* Texto claro */
+}
+
+.error-message {
+  color: rgb(255, 80, 80); /* Vermelho claro */
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+</style>

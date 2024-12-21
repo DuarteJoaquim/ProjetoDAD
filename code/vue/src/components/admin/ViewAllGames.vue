@@ -130,6 +130,7 @@ fetchGames();
     </div>
   
       <!-- Tabela de jogos -->
+     <div class="table-container">  
       <table v-if="games.length">
         <thead>
           <tr>
@@ -167,125 +168,170 @@ fetchGames();
         <button :disabled="!pagination.next_page_url" @click="fetchGames(pagination.next_page_url)">Next</button>
       </div>
     </div>
+    </div>
   </template>
   
   
-  
   <style scoped>
-.view-container {
-  background-color: var(--background); /* Cor de fundo */
-  color: var(--foreground); /* Cor do texto */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px;
-  width: 100%;
-  min-height: 100vh;
-  box-sizing: border-box;
-}
+  .view-container {
+    background-color: #121212 !important;
+    color: var(--foreground);
+    padding: 20px;
+    min-height: 100vh;
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+  }
 
-h1 {
-  font-size: 2.5rem;
-  color: var(--primary); /* Cor principal */
-  margin-bottom: 20px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Adiciona contraste */
-}
-
-table {
-  width: 100%;
-  max-width: 1200px;
-  border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra */
-  background-color: var(--card-background); /* Fundo da tabela */
-}
-
-thead {
-  background-color: var(--primary-dark); /* Fundo do cabeçalho */
-  color: #ffffff; /* Texto branco para contraste */
-}
-
-thead th {
-  padding: 15px;
-  text-align: left;
-  font-size: 1.2rem;
-  border-bottom: 2px solid var(--primary); /* Linha de separação */
-}
-
-tbody tr {
-  transition: background-color 0.3s ease;
-}
-
-tbody tr:nth-child(even) {
-  background-color: var(--background-light); /* Alterna cores */
-}
-
-tbody tr:hover {
-  background-color: var(--primary-light); /* Realça ao passar o mouse */
-  cursor: pointer;
-}
-
-td {
-  padding: 15px;
-  font-size: 1rem;
-  color: var(--foreground); /* Garante contraste */
-  border-bottom: 1px solid var(--background-dark);
-}
-
-button {
-  background: linear-gradient(145deg, #2C3E50, #1A1A2E);
-  color: #ffffff; /* Cor do texto do botão */
-  padding: 8px 12px;
-  font-size: 1rem;
-  border: 2px solid var(--primary);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-button:hover {
-  background: linear-gradient(145deg, var(--primary-dark), var(--primary-light));
-  color: var(--background); /* Garante contraste */
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: translateY(1px);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 8px 16px;
-  font-size: 1rem;
-  color: #ffffff; /* Cor do texto */
-  background-color: var(--primary-dark); /* Fundo do botão */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.pagination button:hover {
-  background-color: var(--primary-light);
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-  font-size: 1.2rem;
-}
-
-div, table, td, th {
-  color: #000 !important;
-  opacity: 1 !important;
-  filter: none !important; /* Remove filtros como blur */
-}
-</style>
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .back-button {
+    padding: 5px 10px;
+    background: linear-gradient(145deg, #2b0606, #e74c3c);
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-button:hover {
+    background: linear-gradient(145deg, #c0392b, #e74c3c);
+    transform: translateY(-2px);
+  }
+  
+  .filter-button {
+    padding: 10px 20px;
+    background: linear-gradient(145deg, #5763D6, #3944BC);
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-button:hover {
+    background: linear-gradient(145deg, #151e7c, #5763D6);
+    transform: translateY(-2px);
+  }
+  
+  .filter-button.active {
+    background: linear-gradient(145deg, #151e7c, #000000);
+    color: white;
+    font-weight: bold;
+  }
+  
+  .filter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #121212 !important;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  thead th {
+    padding: 10px;
+    background: linear-gradient(145deg, #3944BC, #5763D6);
+    color: white;
+    text-transform: uppercase;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #ffffff00 !important;
+  }
+  
+  tbody tr:nth-child(odd) {
+    background: #000000;
+  }
+  
+  tbody td {
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  
+  .pagination-button {
+    background: linear-gradient(145deg, #2C3E50, #1A1A2E);
+    color: #EAEAEA;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .pagination-button:disabled {
+    background: #bbb;
+    color: #666;
+    cursor: not-allowed;
+  }
+  
+  .pagination-button:hover:not(:disabled) {
+    background: linear-gradient(145deg, #1A1A2E, #121212);
+    transform: translateY(-3px);
+  }
+  
+  .pagination span {
+    font-weight: bold;
+    color: var(--foreground);
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .filter-group {
+      flex-direction: column;
+    }
+     
+    .table-container {
+      overflow-x: auto;
+    }
+  
+    table {
+      font-size: 0.9rem;
+    }
+  
+    .pagination {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  
+  </style>
+  
+    

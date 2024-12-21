@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum', 'isAdmin'])->group(function () {
     Route::get('/admin/users', [AdminController::class, 'Userindex']);
     Route::post('/auth/register-admin', [AuthController::class, 'registerAdmin']);
     Route::patch('/users/{id}/toggle-block', [AdminController::class, 'toggleBlockUser']);
-
+    Route::get('admin/statistics', [GameController::class, 'getStatistics']);
 });
 
 Route::post('/auth/login', [AuthController::class, 'login']);

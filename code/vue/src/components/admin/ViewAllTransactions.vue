@@ -1,11 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
 
 // Dados reativos
 const transactions = ref([]);
 const pagination = ref({});
 const error = ref(null);
+const router = useRouter();
 
 // Filtros reativos
 const typeFilter = ref('all');
@@ -44,6 +46,12 @@ const setPaymentFilter = (paymentType) => {
   fetchTransactions(); // Atualiza as transações
 };
 
+// Função para voltar para a página anterior
+const goBack = () => {
+  router.back(); // Usa o histórico do navegador para voltar
+};
+
+
 // Carregar transações ao montar o componente
 fetchTransactions();
 </script>
@@ -51,6 +59,8 @@ fetchTransactions();
 
 <template>
     <div class="view-container">
+      <!-- Botão para voltar -->
+      <button class="back-button" @click="goBack">Back</button>
       <h1>All Transactions</h1>
   
       <!-- Filtros -->
@@ -107,6 +117,7 @@ fetchTransactions();
       </div>
   
       <!-- Tabela de Transações -->
+       <div class="table-container">
       <table v-if="transactions.length">
         <thead>
           <tr>
@@ -139,56 +150,105 @@ fetchTransactions();
         <button :disabled="!pagination.next_page_url" @click="fetchTransactions(pagination.next_page_url)">Next</button>
       </div>
     </div>
+    </div>
   </template>
 
 <style scoped>
 .view-container {
-  background-color: var(--background);
+  background-color: #121212 !important;
   color: var(--foreground);
   padding: 20px;
   min-height: 100vh;
+  text-align: center;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 3.5rem;
   margin-bottom: 20px;
 }
 
+.back-button {
+  padding: 5px 10px;
+  background: linear-gradient(145deg, #2b0606, #e74c3c);
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background: linear-gradient(145deg, #c0392b, #e74c3c);
+  transform: translateY(-2px);
+}
+
+.filter-button {
+  padding: 10px 20px;
+  background: linear-gradient(145deg, #5763D6, #3944BC);
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button:hover {
+  background: linear-gradient(145deg, #151e7c, #5763D6);
+  transform: translateY(-2px);
+}
+
+.filter-button.active {
+  background: linear-gradient(145deg, #151e7c, #000000);
+  color: white;
+  font-weight: bold;
+}
+
 .filter-container {
-  margin-bottom: 20px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
+  margin-bottom: 20px;
 }
 
 .filter-group {
   display: flex;
-  flex-direction: column;
   gap: 10px;
-}
-
-.filter-button {
-  padding: 8px 16px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.filter-button.active {
-  background: var(--primary-dark);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background-color: #121212 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+thead th {
   padding: 10px;
-  border: 1px solid var(--background-dark);
+  background: linear-gradient(145deg, #3944BC, #5763D6);
+  color: white;
+  text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #ffffff00 !important;
+}
+
+tbody tr:nth-child(odd) {
+  background: #000000;
+}
+
+tbody td {
+  padding: 10px;
+  text-align: center;
 }
 
 .pagination {
@@ -200,11 +260,11 @@ th, td {
 }
 
 .pagination-button {
-  background: linear-gradient(145deg, #2C3E50, #1A1A2E); /* Gradiente escuro */
-  color: #EAEAEA; /* Texto claro */
+  background: linear-gradient(145deg, #2C3E50, #1A1A2E);
+  color: #EAEAEA;
   font-size: 1rem;
   padding: 10px 20px;
-  border: 2px solid #3944BC; /* Borda azul */
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
@@ -212,29 +272,46 @@ th, td {
 }
 
 .pagination-button:disabled {
-  background: #555; /* Cor desativada */
-  color: #aaa;
-  border-color: #444; /* Borda mais clara */
+  background: #bbb;
+  color: #666;
   cursor: not-allowed;
 }
 
 .pagination-button:hover:not(:disabled) {
-  background: linear-gradient(145deg, #1A1A2E, #121212); /* Gradiente mais escuro */
-  border-color: #5763D6; /* Azul vibrante */
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(145deg, #1A1A2E, #121212);
   transform: translateY(-3px);
 }
 
 .pagination span {
-  color: var(--foreground); /* Cor do texto no tema */
   font-weight: bold;
+  color: var(--foreground);
 }
 
-div, table, td, th {
-  color: #000 !important;
-  opacity: 1 !important;
-  filter: none !important; /* Remove filtros como blur */
+/* Responsividade */
+@media (max-width: 768px) {
+  .filter-group {
+    flex-direction: column;
+  }
+   
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
 </style>
 
   

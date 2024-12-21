@@ -8,7 +8,6 @@ import NewGame from '@/components/game/NewGame.vue';
 import GameHistory from '@/components/game/GameHistory.vue';
 import Scoreboard from '@/components/game/Scoreboard.vue';
 import Coins from '@/components/coins/Coins.vue';
-import WebSocketTest from "@/components/WebSocketTest.vue";
 import Lobby from "@/components/game/Lobby.vue";
 import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -29,7 +28,6 @@ const router = createRouter({
     { path: '/game/scoreboard', name: 'scoreboard', component: Scoreboard },
     { path: '/game', name: 'game', component: Game },
     { path: '/coins', name: 'coins', component: Coins },
-    { path: "/websocket", name: "websocket", component: WebSocketTest },
 
 
     // Rota para o componente AdminDashboard
