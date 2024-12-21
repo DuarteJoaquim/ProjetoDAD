@@ -30,6 +30,7 @@
   const fetchStatistics = async () => {
     try {
       const response = await axios.get('/statistics/general');
+      console.log('Dados recebidos:', response.data);
       const data = response.data;
   
       // Configurando os dados recebidos
