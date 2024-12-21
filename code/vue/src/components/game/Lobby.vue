@@ -3,10 +3,10 @@
     <div class="lobby-container">
       <!-- Lista de Lobbys -->
       <template v-if="!inLobby">
-        <h1>Lista de Lobbys</h1>
+        <h1 style="font-size: 42px;">Lista de Lobbys</h1>
         <div>
           <label for="boardSize">Tamanho do Tabuleiro:</label>
-          <select v-model="boardSize" id="boardSize">
+          <select style="margin-left: 3%; background-color: gray;" v-model="boardSize" id="boardSize">
             <option value="4">4x4</option>
             <option value="6">6x6</option>
             <option value="8">8x8</option>
@@ -17,7 +17,7 @@
         <table>
           <thead>
             <tr>
-              <th>ID do Lobby</th>
+              <th class="id">ID do Lobby</th>
               <th>Dono</th>
               <th>Tamanho</th>
               <th>Ações</th>
@@ -25,9 +25,9 @@
           </thead>
           <tbody>
             <tr v-for="lobby in lobbies" :key="lobby.id">
-              <td>{{ lobby.id }}</td>
-              <td>{{ lobby.owner }}</td>
-              <td>{{ lobby.boardSize }}x{{ lobby.boardSize }}</td>
+              <td class="id">{{ lobby.id }}</td>
+              <td class="nick">{{ nickname }}</td>
+              <td class="boardSize">{{ lobby.boardSize }}x{{ lobby.boardSize }}</td>
               <td>
                 <button @click="joinLobby(lobby.id)" class="join-button">Entrar</button>
               </td>
@@ -188,7 +188,6 @@ table {
   border-collapse: collapse;
 }
 
-
 th, td {
   padding: 10px;
   border: 1px solid #444;
@@ -198,7 +197,6 @@ th {
   background-color: #3944bc;
   color: white;
 }
-
 
 select {
   margin: 10px 0;
@@ -211,7 +209,7 @@ select {
   background-color: #1e1e1e;
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
-  max-width: 400px;
+  max-width: 70%;
   width: 100%;
 }
 
@@ -238,5 +236,28 @@ button {
 button:hover {
   background-color: #283593;
   transform: translateY(-2px);
+}
+
+tbody tr:nth-child(even) {
+  background-color: #333;
+}
+
+/* Adiciona o scroll horizontal para tabelas em dispositivos menores */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 850px) {
+  .lobby-container {
+    padding: 1rem;
+  }
+
+  table {
+    width: 100%;
+  }
+  tr .id {
+    display: none;
+  }
 }
 </style>
