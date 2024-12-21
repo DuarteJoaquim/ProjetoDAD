@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
 
+const router = useRouter();
 // Dados reativos
 const users = ref([]);
 const pagination = ref({});
@@ -74,23 +76,30 @@ const handlePagination = (url) => {
   fetchUsers(url);
 };
 
+// Função para voltar para a página anterior
+const goBack = () => {
+  router.back(); // Usa o histórico do navegador para voltar
+};
+
+
 // Buscar usuários ao carregar o componente
 onMounted(fetchUsers);
 </script>
 
 <template>
   <div class="view-container">
+    <button class="back-button" @click="goBack">Back</button>
     <h1>Manage Users</h1>
 
     <!-- Campo de busca -->
     <div class="search-container">
-      <input
+      <input style="color: black;"
         type="text"
         v-model="searchQuery"
         placeholder="Search by name or email"
         class="search-input"
       />
-      <button class="search-button" @click="applySearch">Search</button>
+      <button class="filter-button" @click="applySearch">Search</button>
     </div>
 
     <!-- Exibição de erro -->
@@ -115,8 +124,8 @@ onMounted(fetchUsers);
           <td>{{ user.email }}</td>
           <td>{{ user.created_at }}</td>
           <td>{{ user.blocked ? "Blocked" : "Active" }}</td>
-          <td>
-            <button @click="toggleBlockUser(user)">
+          <td style="display: table-cell;">
+            <button class="button-block" @click="toggleBlockUser(user)">
               {{ user.blocked ? "Unblock" : "Block" }}
             </button>
             <button class="delete-button" @click="deleteUser(user)">
@@ -169,6 +178,7 @@ h1 {
 
 .search-input {
   padding: 8px;
+  width: 200px;
   font-size: 1rem;
   border: 2px solid var(--primary-dark);
   border-radius: 8px;
@@ -192,7 +202,6 @@ h1 {
 table {
   width: 100%;
   max-width: 1200px;
-  border-collapse: collapse;
   margin: 20px 0;
 }
 
@@ -212,7 +221,6 @@ tbody tr:nth-child(even) {
 
 tbody td {
   padding: 10px;
-  border-bottom: 1px solid var(--background-dark);
 }
 
 button {
@@ -237,6 +245,13 @@ button:hover {
   background-color: #c9302c;
 }
 
+.button-block {
+  background-color: #1a1c9b; /* Verde para bloquear/desbloquear */
+}
+.button-block:hover {
+  background-color: #0d0e4f;
+}
+
 .pagination {
   display: flex;
   justify-content: center;
@@ -245,8 +260,166 @@ button:hover {
 }
 
 div, table, td, th {
-  color: #000 !important;
   opacity: 1 !important;
   filter: none !important; /* Remove filtros como blur */
 }
+
+.view-container {
+  background-color: #121212 !important;
+  color: var(--foreground);
+  padding: 20px;
+  min-height: 100vh;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  padding: 5px 10px;
+  background: linear-gradient(145deg, #2b0606, #e74c3c);
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background: linear-gradient(145deg, #c0392b, #e74c3c);
+  transform: translateY(-2px);
+}
+
+.filter-button {
+  padding: 10px 20px;
+  background: linear-gradient(145deg, #5763D6, #3944BC);
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button:hover {
+  background: linear-gradient(145deg, #151e7c, #5763D6);
+  transform: translateY(-2px);
+}
+
+.filter-button.active {
+  background: linear-gradient(145deg, #151e7c, #000000);
+  color: white;
+  font-weight: bold;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  background-color: #121212 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+thead th {
+  padding: 10px;
+  background: linear-gradient(145deg, #3944BC, #5763D6);
+  color: white;
+  text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #ffffff00 !important;
+}
+
+tbody tr:nth-child(odd) {
+  background: #000000;
+}
+
+tbody td {
+  padding: 10px;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.pagination-button {
+  background: linear-gradient(145deg, #2C3E50, #1A1A2E);
+  color: #EAEAEA;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pagination-button:disabled {
+  background: #bbb;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #1A1A2E, #121212);
+  transform: translateY(-3px);
+}
+
+.pagination span {
+  font-weight: bold;
+  color: var(--foreground);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .filter-group {
+    flex-direction: column;
+  }
+   
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
 </style>
+
+  

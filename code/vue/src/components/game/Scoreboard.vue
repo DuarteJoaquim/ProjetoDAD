@@ -2,7 +2,9 @@
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
   import { useAuthStore } from '@/stores/auth'
-  
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter();
   const storeAuth = useAuthStore();
 
 
@@ -83,7 +85,12 @@ const loadAllGlobalScores = async () => {
     } else if (index === 2) {
       return { backgroundColor: '#cd7f32', color: 'white' };
     }
-    return { color: 'black' };
+    return { color: 'white' };
+  };
+
+  // Função para voltar para a página anterior
+  const goBack = () => {
+    router.back(); // Usa o histórico do navegador para voltar
   };
 
   // Load data on component mount
@@ -98,7 +105,7 @@ const loadAllGlobalScores = async () => {
 
 <template>
   <div class="scoreboard-container">
-
+    <button class="back-button" @click="goBack">Back</button>
     <br>
     <!-- <h1>Scoreboard</h1> -->
 
@@ -178,10 +185,9 @@ const loadAllGlobalScores = async () => {
   </div>
 </div>
 <div v-else>
-  <p class="no-data">No multiplayer scores available.</p>
+  <p style="color: white;" class="no-data">No multiplayer scores available.</p>
 </div>
-
-
+<br>
 
     <!-- Global Scoreboards -->
     <div v-for="(scores, boardSize) in globalScores" :key="boardSize" class="global-scoreboard">
@@ -216,10 +222,11 @@ const loadAllGlobalScores = async () => {
 
 <style scoped>
   .scoreboard-container {
-    margin-left: 20px;
-    margin-right: 20px;
-    color: #333;
-    background-color: #fff;
+    background-color: #121212 !important;
+    color: var(--foreground);
+    padding: 20px;
+    min-height: 100vh;
+    text-align: center;
   }
 
 
@@ -231,16 +238,11 @@ const loadAllGlobalScores = async () => {
     margin-bottom: 20px;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
 
   th, td {
     padding: 10px;
     text-align: left;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
   }
 
   th {
@@ -249,7 +251,7 @@ const loadAllGlobalScores = async () => {
 
   .no-data {
     text-align: center;
-    color: black;
+    color: rgba(255, 255, 255, 0.486);
   }
 
   hr {
@@ -262,7 +264,7 @@ const loadAllGlobalScores = async () => {
   .personal-multiplayer-scoreboard,
   .personal-scoreboard,
   .global-scoreboard {
-    margin-bottom: 40px;
+    padding-bottom: 30px;
   }
 
 
@@ -274,4 +276,160 @@ const loadAllGlobalScores = async () => {
   td[style] {
     color: black;
   }
+
+.view-container {
+  background-color: #121212 !important;
+  color: var(--foreground);
+  padding: 20px;
+  min-height: 100vh;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  padding: 5px 10px;
+  background: linear-gradient(145deg, #2b0606, #e74c3c);
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:hover {
+  background: linear-gradient(145deg, #c0392b, #e74c3c);
+  transform: translateY(-2px);
+}
+
+.filter-button {
+  padding: 10px 20px;
+  background: linear-gradient(145deg, #5763D6, #3944BC);
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button:hover {
+  background: linear-gradient(145deg, #151e7c, #5763D6);
+  transform: translateY(-2px);
+}
+
+.filter-button.active {
+  background: linear-gradient(145deg, #151e7c, #000000);
+  color: white;
+  font-weight: bold;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #121212 !important;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+thead th {
+  padding: 10px;
+  background: linear-gradient(145deg, #3944BC, #5763D6);
+  color: white;
+  text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #ffffff00 !important;
+}
+
+tbody tr:nth-child(odd) {
+  background: #000000;
+}
+
+tbody td {
+  padding: 10px;
+  text-align: center;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.pagination-button {
+  background: linear-gradient(145deg, #2C3E50, #1A1A2E);
+  color: #EAEAEA;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pagination-button:disabled {
+  background: #bbb;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #1A1A2E, #121212);
+  transform: translateY(-3px);
+}
+
+.pagination span {
+  font-weight: bold;
+  color: var(--foreground);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .filter-group {
+    flex-direction: column;
+  }
+   
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
 </style>
+
+  

@@ -54,9 +54,6 @@ const logout = () => {
         <img src="@/assets/brain-coin.png" alt="Coins" class="coin-icon" />
         <span class="coin-count">{{ storeCoins.gameCoins }}</span>
       </div>
-      <router-link v-show="storeAuth.user" :to="{ name: 'websocket' }" class="websocket-button">
-        WebSocket
-      </router-link>
       <router-link v-show="!storeAuth.user" :to="{ name: 'login' }" class="login-button">
         Login
       </router-link>
@@ -68,6 +65,8 @@ const logout = () => {
 </template>
 
 <style scoped>
+
+
 .header {
   display: flex;
   justify-content: space-between;

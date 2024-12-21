@@ -244,6 +244,32 @@ public function personalMultiplayerScoreboard(Request $request)
     ]);
 }
 
+public function getStatistics()
+    {
+        // Estatísticas genéricas
+        $totalPlayers = User::count();
+        $totalGames = Game::count();
+        $gamesLastWeek = Game::where('created_at', '>=', now()->subWeek())->count();
+        $gamesLastMonth = Game::where('created_at', '>=', now()->subMonth())->count();
+
+        // Estatísticas adicionais para administradores
+        $totalPurchases = Transaction::where('type', 'purchase')->sum('amount');
+        $purchasesByPlayer = Transaction::where('type', 'purchase')
+            ->selectRaw('user_id, SUM(amount) as total')
+            ->groupBy('user_id')
+            ->with('user:id,name')
+            ->get();
+
+        return response()->json([
+            'total_players' => $totalPlayers,
+            'total_games' => $totalGames,
+            'games_last_week' => $gamesLastWeek,
+            'games_last_month' => $gamesLastMonth,
+            'total_purchases' => $totalPurchases,
+            'purchases_by_player' => $purchasesByPlayer,
+        ]);
+    }
+
 
 
 
