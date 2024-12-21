@@ -121,7 +121,6 @@ private function isGlobalTop3($boardId, $turns, $time)
 
         $games = Game::with(['creator:id,nickname', 'winner:id,nickname'])
             ->where('created_user_id', $user->id)
-            ->where('games.board_id')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -167,53 +166,87 @@ private function isGlobalTop3($boardId, $turns, $time)
         return response()->json($scores);
     }
 
-    public function globalScoreboard_3por4()
-    {
-        $scores = Game::join('users', 'games.created_user_id', '=', 'users.id')
-            ->join('boards', 'games.board_id', '=', 'boards.id')
-            ->where('boards.board_cols', 3)
-            ->where('boards.board_rows', 4)
-            ->whereNotNull('games.total_time') // Ensure total_time is not NULL
-            ->whereNotNull('games.total_turns_winner') // Ensure total_turns_winner is not NULL
-            ->orderBy('games.total_turns_winner', 'asc')
-            ->orderBy('games.total_time', 'asc')
+    public function globalScoreboard(Request $request)
+{
+    $boardCols = $request->input('cols'); // Ex: 3
+    $boardRows = $request->input('rows'); // Ex: 4
+
+    $scores = Game::join('users', 'games.created_user_id', '=', 'users.id')
+        ->join('boards', 'games.board_id', '=', 'boards.id')
+        ->where('boards.board_cols', $boardCols)
+        ->where('boards.board_rows', $boardRows)
+        ->whereNotNull('games.total_time') // Garantir que total_time não é NULL
+        ->whereNotNull('games.total_turns_winner') // Garantir que total_turns_winner não é NULL
+        ->orderBy('games.total_time', 'asc')
+        ->orderBy('games.total_turns_winner', 'asc')
+        ->take(5)
+        ->get([
+            'users.nickname as player',
+            'games.total_time as bestTime',
+            'games.total_turns_winner as fewestTurns'
+        ]);
+
+    return response()->json($scores);
+}
+
+public function globalMultiplayerScoreboard(Request $request)
+{
+    $boardCols = $request->input('cols');
+    $boardRows = $request->input('rows');
+
+    try {
+        $scores = Game::join('boards', 'games.board_id', '=', 'boards.id')
+            ->leftJoin('users', 'games.winner_user_id', '=', 'users.id')
+            ->leftJoin('multiplayer_games_played', 'games.id', '=', 'multiplayer_games_played.game_id')
+            ->where('boards.board_cols', $boardCols)
+            ->where('boards.board_rows', $boardRows)
+            ->whereNotNull('games.winner_user_id')
+            ->groupBy('users.id', 'users.nickname', 'boards.board_cols', 'boards.board_rows')
+            ->orderByRaw('COUNT(games.winner_user_id) DESC, MIN(games.created_at) ASC')
             ->take(5)
-            ->get(['users.nickname as player', 'games.total_time as bestTime', 'games.total_turns_winner as fewestTurns']);
+            ->get([
+                'users.nickname as player',
+                'boards.board_cols',
+                'boards.board_rows',
+                \DB::raw('COUNT(games.winner_user_id) as victories'),
+            ]);
 
         return response()->json($scores);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching multiplayer scoreboard: ' . $e->getMessage());
+        return response()->json(['error' => 'Error fetching multiplayer scoreboard.'], 500);
     }
+}
 
-    public function globalScoreboard_4por4()
-    {
-        $scores = Game::join('users', 'games.created_user_id', '=', 'users.id')
-            ->join('boards', 'games.board_id', '=', 'boards.id')
-            ->where('boards.board_cols', 4)
-            ->where('boards.board_rows', 4)
-            ->whereNotNull('games.total_time') // Ensure total_time is not NULL
-            ->whereNotNull('games.total_turns_winner') // Ensure total_turns_winner is not NULL
-            ->orderBy('games.total_turns_winner', 'asc')
-            ->orderBy('games.total_time', 'asc')
-            ->take(5)
-            ->get(['users.nickname as player', 'games.total_time as bestTime', 'games.total_turns_winner as fewestTurns']);
 
-        return response()->json($scores);
-    }
 
-    public function globalScoreboard_6por6()
-    {
-        $scores = Game::join('users', 'games.created_user_id', '=', 'users.id')
-            ->join('boards', 'games.board_id', '=', 'boards.id')
-            ->where('boards.board_cols', 6)
-            ->where('boards.board_rows', 6)
-            ->whereNotNull('games.total_time') // Ensure total_time is not NULL
-            ->whereNotNull('games.total_turns_winner') // Ensure total_turns_winner is not NULL
-            ->orderBy('games.total_turns_winner', 'asc')
-            ->orderBy('games.total_time', 'asc')
-            ->take(5)
-            ->get(['users.nickname as player', 'games.total_time as bestTime', 'games.total_turns_winner as fewestTurns']);
 
-        return response()->json($scores);
-    }
+public function personalMultiplayerScoreboard(Request $request)
+{
+    $userId = $request->user()->id;
+
+    // Total de vitórias
+    $victories = Game::where('winner_user_id', $userId)->count();
+
+
+    // Total de derrotas
+    $losses = Game::leftJoin('multiplayer_games_played', 'games.id', '=', 'multiplayer_games_played.game_id')
+        ->where(function ($query) use ($userId) {
+            $query->where('games.created_user_id', $userId) // Perdeu como criador
+                  ->orWhere('multiplayer_games_played.user_id', $userId); // Perdeu como convidado
+        })
+        ->where('games.winner_user_id', '!=', $userId) // O jogador não foi o vencedor
+        ->count();
+
+    return response()->json([
+        'victories' => $victories,
+        'losses' => $losses,
+    ]);
+}
+
+
+
+
 
 
     public function update(Request $request, $id)

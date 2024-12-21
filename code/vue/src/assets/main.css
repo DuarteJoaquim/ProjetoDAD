@@ -77,6 +77,13 @@ body {
   }
 }
 
+body {
+  background-color: black !important;
+  color: hsl(var(--foreground));
+  width: 100%;
+}
+
+
 .toast-success {
   background-color: #4CAF50;
   color: white;

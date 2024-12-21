@@ -8,11 +8,12 @@ const router = useRouter();
 const route = useRoute();
 const storeAuth = useAuthStore();
 
-const nickname = storeAuth.userNickname;
-const userId = storeAuth.userId;
+
 const lobbyId = ref(route.query.lobbyId); // ID do lobby recebido via query params
 const boardSize = ref(parseInt(route.query.boardSize) || 4); // Tamanho do tabuleiro recebido
-const hidden = new URL('@/assets/img/icon/hidden.png', import.meta.url).href;
+const hidden = new URL('@/assets/img/icon/empty.png', import.meta.url).href;
+const scores = ref({}); // Pontuação dos jogadores
+const playerMap = ref({}); // Mapeamento de ID de jogador para nome
 
 const initialCards = ref([
     // Populate with card details as in your existing setup
@@ -41,13 +42,9 @@ const initialCards = ref([
 
 
 const cards = ref([]); // Estado do tabuleiro
-const cardsChosen = ref([]);
-const cardsChosenId = ref([]);
-const cardsWon = ref([]);
 const currentTurn = ref(null);
 const playerId = ref(socket.id);
 const lockBoard = ref(false);
-const gameStarted = ref(false);
 const resultMessage = ref("0");
 
 // Inicializar o tabuleiro com base no tamanho e no estado recebido
@@ -62,6 +59,9 @@ const initializeBoard = (gameState) => {
 const flipCard = (index) => {
   if (currentTurn.value !== playerId.value || lockBoard.value) return; // Apenas o jogador atual pode jogar
 
+  const flippedCards = cards.value.filter((c) => c.isFlipped && !c.isMatched);
+  if (flippedCards.length >= 2) return; // Bloqueia a ação após 2 cartas viradas
+
   const card = cards.value[index];
   if (card.isFlipped || card.isMatched) return;
 
@@ -71,22 +71,51 @@ const flipCard = (index) => {
 
 // Eventos do WebSocket
 onMounted(() => {
+  // Receber o estado inicial do jogo
   socket.on("gameStarted", (data) => {
     console.log("Jogo iniciado:", data);
     initializeBoard(data.gameState);
     currentTurn.value = data.currentTurn;
+
+    scores.value = data.scores || {}; // Inicializar pontuação
+    playerMap.value = Object.fromEntries(data.players.map(p => [p.id, p.nickname]));
+    
   });
 
+  // Atualizar o estado do jogo
   socket.on("updateGameState", (data) => {
     console.log("Estado do jogo atualizado:", data);
+
     initializeBoard(data.gameState);
+
+    // Atualiza o turno atual
     currentTurn.value = data.currentTurn;
+
+    // Atualiza as pontuações
+    scores.value = data.scores;
+
+    // Atualiza o mapeamento dos jogadores e seus apelidos
+    playerMap.value = Object.fromEntries(
+      data.players.map((p) => [p.id, p.nickname])
+    );
   });
 
+
+  // Receber o fim do jogo
   socket.on("gameEnded", (data) => {
     console.log("Jogo terminado:", data);
-    resultMessage.value = `O jogo terminou! Vencedor: ${data.winner}`;
+
+    if (Array.isArray(data.players) && data.players.length > 0) {
+      playerMap.value = Object.fromEntries(data.players.map(p => [p.id, p.nickname]));
+    } else {
+      console.error("Jogadores ausentes ou inválidos no estado do jogo terminado:", data);
+      playerMap.value = {};
+    }
+
+    scores.value = data.scores;
+    resultMessage.value = data.message;
   });
+
 });
 
 // Voltar ao lobby
@@ -101,22 +130,35 @@ const goToLobby = () => {
     <p v-if="currentTurn === playerId">O teu turno!</p>
     <p v-else>Aguarda o adversário...</p>
 
-    <div class="board" :class="{ locked: currentTurn !== playerId }" :style="`grid-template-columns: repeat(${boardSize}, 1fr);`">
+    <!-- Tabuleiro -->
+    <div class="board" :class="{ locked: currentTurn !== playerId }"  :style="`grid-template-columns: repeat(${boardSize}, 1fr);`">
       <div
         v-for="(card, index) in cards"
         :key="index"
         class="card"
-        :class="{ flipped: card.isFlipped || card.isMatched }"
+        :class="{ flipped: card.isFlipped , removed: card.isMatched }"
         @click="flipCard(index)"
       >
         <img :src="card.isFlipped || card.isMatched ? card.img : hidden" />
       </div>
     </div>
 
+    <!-- Placar -->
+    <div class="scoreboard">
+      <h2>Placar</h2>
+      <ul>
+        <li v-for="(score, playerId) in scores" :key="playerId">
+          {{ playerMap[playerId] || "Desconhecido" }}: {{ score }} pares
+        </li>
+      </ul>
+    </div>
+
+    <!-- Mensagem de resultado -->
     <div class="game-result" v-if="resultMessage">
       <p>{{ resultMessage }}</p>
     </div>
 
+    <!-- Botão para voltar ao lobby -->
     <button @click="goToLobby" class="button">Voltar ao Lobby</button>
   </div>
 </template>
@@ -125,6 +167,8 @@ const goToLobby = () => {
 .multiplayer-game {
   text-align: center;
   padding: 20px;
+  background-color: black;
+  height: max-content;
 }
 
 .board {
@@ -145,11 +189,15 @@ const goToLobby = () => {
   border-radius: 10px;
 }
 
-.locked {
-  pointer-events: none; /* Desabilita interações */
-  opacity: 0.6; /* Reduz a opacidade */
+.card.removed {
+  visibility: hidden; /* Esconde as cartas combinadas */
 }
 
+
+.locked {
+  pointer-events: none; 
+  opacity: 0.6; 
+}
 .card img {
   width: 100%;
   height: auto;
@@ -157,6 +205,12 @@ const goToLobby = () => {
 
 .card.flipped {
   transform: rotateY(180deg);
+}
+
+.scoreboard {
+  margin-top: 20px;
+  text-align: left;
+  font-size: 1.2rem;
 }
 
 .button {
