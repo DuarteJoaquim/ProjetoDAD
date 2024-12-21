@@ -13,7 +13,13 @@ import Lobby from "@/components/game/Lobby.vue";
 import GameMultiplayer from "@/components/game/GameMultiplayer.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast/use-toast";
+<<<<<<< HEAD
 import GeneralStatistics from "@/views/GeneralStatistics.vue";
+=======
+import AdminDashboard from '@/components/admin/AdminDashboard.vue'; // Importar o componente AdminDashboard para a rota
+import TransactionHistory from '@/components/user/TransactionHistory.vue';
+
+>>>>>>> eee742ff3bd85c96fc9a01a0a3bb1ddc9faf4d63
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +37,24 @@ const router = createRouter({
     { path: '/game', name: 'game', component: Game },
     { path: '/coins', name: 'coins', component: Coins },
     { path: "/websocket", name: "websocket", component: WebSocketTest },
+
+
+    // Rota para o componente AdminDashboard
+    { path: '/admin', name: 'admin', component: AdminDashboard}, /*meta: { requiresAdmin: true }},*/
+
+    {path: '/admin/manage-users',name: 'manageUsers',component: () => import('@/components/admin/ManageUsers.vue'),},
+
+    {path: '/admin/view-games',name: 'viewAllGames',component: () => import('@/components/admin/ViewAllGames.vue'),},
+
+    {path: '/admin/view-transactions',name: 'viewAllTransactions',component: () => import('@/components/admin/ViewAllTransactions.vue'),},
+    {path: '/admin/view-stats',name: 'adminStats',component: () => import('@/components/admin/ViewStatistics.vue'),},
+
+    {path: '/admin/create-admin',name: 'createAdmin',component: () => import('@/components/admin/CreateAdmin.vue'),},
+    
+    // Rota para Users
+    
+    { path: '/transactions/history', name: 'transactionHistory', component: TransactionHistory },
+
     {
       path: '/multi',
       name: 'multiPlayerGames',
