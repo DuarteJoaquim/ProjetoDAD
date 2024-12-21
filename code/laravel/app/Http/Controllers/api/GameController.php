@@ -189,6 +189,64 @@ private function isGlobalTop3($boardId, $turns, $time)
     return response()->json($scores);
 }
 
+public function globalMultiplayerScoreboard(Request $request)
+{
+    $boardCols = $request->input('cols');
+    $boardRows = $request->input('rows');
+
+    try {
+        $scores = Game::join('boards', 'games.board_id', '=', 'boards.id')
+            ->leftJoin('users', 'games.winner_user_id', '=', 'users.id')
+            ->leftJoin('multiplayer_games_played', 'games.id', '=', 'multiplayer_games_played.game_id')
+            ->where('boards.board_cols', $boardCols)
+            ->where('boards.board_rows', $boardRows)
+            ->whereNotNull('games.winner_user_id')
+            ->groupBy('users.id', 'users.nickname', 'boards.board_cols', 'boards.board_rows')
+            ->orderByRaw('COUNT(games.winner_user_id) DESC, MIN(games.created_at) ASC')
+            ->take(5)
+            ->get([
+                'users.nickname as player',
+                'boards.board_cols',
+                'boards.board_rows',
+                \DB::raw('COUNT(games.winner_user_id) as victories'),
+            ]);
+
+        return response()->json($scores);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching multiplayer scoreboard: ' . $e->getMessage());
+        return response()->json(['error' => 'Error fetching multiplayer scoreboard.'], 500);
+    }
+}
+
+
+
+
+public function personalMultiplayerScoreboard(Request $request)
+{
+    $userId = $request->user()->id;
+
+    // Total de vitórias
+    $victories = Game::where('winner_user_id', $userId)->count();
+
+
+    // Total de derrotas
+    $losses = Game::leftJoin('multiplayer_games_played', 'games.id', '=', 'multiplayer_games_played.game_id')
+        ->where(function ($query) use ($userId) {
+            $query->where('games.created_user_id', $userId) // Perdeu como criador
+                  ->orWhere('multiplayer_games_played.user_id', $userId); // Perdeu como convidado
+        })
+        ->where('games.winner_user_id', '!=', $userId) // O jogador não foi o vencedor
+        ->count();
+
+    return response()->json([
+        'victories' => $victories,
+        'losses' => $losses,
+    ]);
+}
+
+
+
+
 
 
     public function update(Request $request, $id)

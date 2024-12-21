@@ -17,7 +17,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/users/me', [UserController::class, 'showMe']);
 
+    //scoreboard
     Route::get('/scoreboard/personal', [GameController::class, 'personalScoreboard']);
+    Route::get('/scoreboard/multiplayer/personal', [GameController::class, 'personalMultiplayerScoreboard']);
+
+    //history
     Route::get('/game/gamehistory', [GameController::class, 'gamehistory']);
     Route::get('/transactions/history', [TransactionController::class, 'userTransactionHistory']);
     
@@ -48,6 +52,9 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/boards', [BoardController::class, 'index']);
 Route::post('/board', [BoardController::class, 'board']);
 
+//scoreboard
 Route::get('/scoreboard', [GameController::class, 'globalScoreboard']);
+Route::get('/scoreboard/multiplayer', [GameController::class, 'globalMultiplayerScoreboard']);
+
 
 
