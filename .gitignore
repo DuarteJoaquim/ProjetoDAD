@@ -132,3 +132,4 @@ dist
 
 docs/.vitepress/dist
 docs/.vitepress/cache
+code/laravel/docker-compose.yml
